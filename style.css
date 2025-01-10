@@ -1,48 +1,135 @@
 body {
-    font-family: "Helvetica";
-    background-color: #f5f5f5;
-    color: #000000;
-    line-height: 1.6;
+    font-family: sans-serif;
     margin: 0;
     padding: 0;
-    align-items: center;
+    background-color: #f9f9f9;
+    color: #333;
+    display: flex;
     justify-content: center;
-    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; 
 }
 
-.header {
-    background: #f5f5f5;
-    color: #000;
-    padding: 0.5rem 0.5;
+#initial-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0; 
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 20px; 
+}
+
+#error-text, #joke-text {
+    font-size: 2em;
+    color: #333;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    margin-right: 30px; 
+}
+#joke-text {
+    opacity: 0; 
+    position: absolute; 
+}
+
+#content {
+    opacity: 0; 
+    transition: opacity 1s ease-in-out;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    max-width: 600px;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
-.header__avatar {
-  padding: 20px;
-  border-radius: 20%;
-  min-width: 200px;
-  width: 20%;
-  height: auto;
-  background-color: #ffffff;
+header {
+    margin-bottom: 30px;
 }
 
-.about_text{
-    font-size: 16px;
+.avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.portfolio {
-    font-size: 16px;
+h1 {
+    margin: 0;
+    font-size: 2.2em;
 }
 
-.about, 
-.portfolio,
-.contact {
-    padding: 15px;
-    margin: 40px auto;
-    width: calc(85% - 10px); /* Ширина равна 30% минус отступ */
-    max-width: 600px; /* Максимальная ширина для центрирования */
-    border: 0.05px solid #006400; /* Увеличил толщину рамки до 4px */
-    border-radius: 32px; /* Закругление углов рамки */
-    text-align: center; /* Центрирование текста */
-    background-color: #ffffff
+.job-title {
+    font-size: 1.2em;
+    color: #777;
+}
+
+section {
+    margin-bottom: 30px;
+}
+
+h2 {
+    font-size: 1.6em;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+p {
+    line-height: 1.6;
+}
+
+.hidden {
+    display: none;
+}
+
+
+@media (max-width: 768px) {
+    #initial-screen {
+        padding: 10px;
+    }
+    #error-text, #joke-text {
+        font-size: 1.5em; 
+    }
+}
+
+@media (max-width: 480px) {
+     #error-text, #joke-text {
+        font-size: 1.2em; 
+    }
 }

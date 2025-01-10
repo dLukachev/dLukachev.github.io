@@ -1,50 +1,38 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="./normalize.css" rel="stylesheet" />
-    <link href="./style.css" rel="stylesheet" />
-    <title>dLukachev</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя Визитка</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <img src="./avatar.jpg" alt="avatar" class="header__avatar"/>
-        <h1 class="header_title">Лукачёв Данил</h1>
-        <p class="header_text">Кредо: чего-то не знать это нормально</p>
-    </header>
-    <section id="about" class="about">
-        <h2 class="header_about">Обо мне</h2>
-        <p class="about_text">Привет! Я Данил, QA-инженер. Расскажу, как я сюда попал.</p>
-        <p class="about_text">Два года я управлял телеграм-каналами: отвечал на сообщения, размещал рекламу, договаривался о рекламных компаниях. Работа стала однообразной, и я понял, что больше тут не вырасту. Потом был опыт ассистента гендиректора в удаленных продажах, но там тоже ничего интересного не происходило. Ситуация усугубилась, когда наш клиент перестала платить зарплату, и многих коллег уволили. Пришло время сменить направление, и я выбрал QA.</p>
-        <p class="about_text">Я начал изучать тестирование ПО. Выбрал курс от QA Studio – много практики и работа с ментором. Мы изучили клиент-серверную архитектуру, виды тестирования, работали с инструментами вроде Postman, DevTools, MongoDB, Docker, Kafka, Charles и другими. Освоил автоматизацию тестов на JavaScript + Cypress и Python + Requests + Pytest для API.</p>
-        <p class="about_text">Мне интересно развиваться, и я начал писать статьи на VC, чтобы делиться опытом с другими.</p>
-    </section>
-    <section id="portfolio", class="portfolio">
-        <h2 class="header_portfolio">Портфолио</h2>
-        <p class="portfolio_title">GitHub:</p>
-        <a class="portfolio_link", href="https://github.com/dLukachev">Аккаунт</a>
-        <p> </p>
-        <a class="portfolio_link", href="https://github.com/dLukachev/autotest_js">Автотесты на JS</a>
-        <p> </p>
-        <a class="portfolio_link", href="https://github.com/dLukachev/autotest_python">Автотесты на Python</a>
-        <p> </p>
-        <a class="portfolio_text", href="https://github.com/dLukachev/telegram_study_bot">Телеграм-бот</a>
-        <p class="portfolio_title">VC:</p>
-        <a class="portfolio_text", href="https://vc.ru/dev/1738005-osnovy-testirovaniya-programmnogo-obespecheniya">1. Основы тестирования</a>
-        <p class="portfolio_text"> </p>
-        <a class="portfolio_text", href="https://vc.ru/dev/1743928-bd-dlya-qa-baza-po-bazam">2. Основы баз данных</a>
-        <p class="portfolio_text"> </p>
-        <a class="portfolio_text", href="https://vc.ru/dev/1744090-mify-o-testirovanii-po-razvenchivaem-populyarnye-zabluzhdeniya">3. Мифы о тестировании ПО</a>
-    </section>
-    <section id="contact" class="contact">
-        <h2 class="header_contact">Контакты</h2>
-        <a class="contact_text", href="tel:79266384045">+7(926)638-40-45</a>
-        <p> </p>
-        <a class="contact_text", href="mailto:danillukachiov@gmail.com"> danillukachiov@gmail.com</p>
-        <a class="contact_text">Телеграм <a/><a class="contact_text", href="https://t.me/ddrxg">@ddrxg</a>
-    </section>
+    <div id="initial-screen">
+        <span id="error-text">Error 404</span>
+        <span id="joke-text">Joke:)</span>
+    </div>
+    <div id="content" class="hidden">
+        <div class="container">
+            <header>
+                <img src="avatar.jpg" alt="Мой аватар" class="avatar">
+                <h1>Данил Лукачёв</h1>
+                <p class="job-title">QA Engineer</p>
+            </header>
+            <section class="about-me">
+                <h2>Обо мне</h2>
+                <p>Профиль <a href="https://github.com/dLukachev">GitHub</a></p>
+                <p>Статьи на VC: <a href="https://vc.ru/dev/1738005-osnovy-testirovaniya-programmnogo-obespecheniya">основы тетсирования, </a><a href="https://vc.ru/dev/1743928-bd-dlya-qa-baza-po-bazam">основы баз данных, </a><a href="https://vc.ru/dev/1744090-mify-o-testirovanii-po-razvenchivaem-populyarnye-zabluzhdeniya">мифы о тестировщиках.</a></p>
+            </section>
+            <section class="contact">
+                <h2>Контакты</h2>
+                <ul>
+                    <li><a href="mailto:danillukachiov@gmail.com">danillukachiov@gmail.com</a></li>
+                    <li><a href="tel:+79266384045">+7 (926) 638-40-45</a></li>
+                    <li><a href="https://t.me/ddrxg">Telegram</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
     <script src="js.js"></script>
 </body>
 </html>
