@@ -139,35 +139,50 @@ export const api = {
   updateReservation: (restaurantId, userId, reservationId, data) => 
     makeRequest('PUT', `/restaurants/${restaurantId}/${userId}/tables/booking/${reservationId}`, data),
 
-  /**
-   * Удалить бронирование
-   * @param {number} restaurantId - ID ресторана
-   * @param {number} userId - ID пользователя
-   * @param {number} reservationId - ID бронирования
-   * @returns {Promise<Object>} Результат удаления
-   */
-  deleteReservation: (restaurantId, userId, reservationId) => 
-    makeRequest('DELETE', `/restaurants/${restaurantId}/${userId}/tables/booking/${reservationId}`),
+    /**
+     * Удалить бронирование
+     * @param {number} restaurantId - ID ресторана
+     * @param {number} userId - ID пользователя
+     * @param {number} reservationId - ID бронирования
+     * @returns {Promise<Object>} Результат удаления
+     */
+    deleteReservation: (restaurantId, userId, reservationId) => 
+      makeRequest('DELETE', `/restaurants/${restaurantId}/${userId}/tables/booking/${reservationId}`),
 
-  // Корзина
-  /**
-   * Получить содержимое корзины пользователя
-   * @param {number} userId - ID пользователя
-   * @returns {Promise<Array>} Содержимое корзины
-   */
-  getCart: (userId) => makeRequest('GET', `/cart/${userId}`),
+    // Корзина
+    /**
+     * Получить содержимое корзины пользователя
+     * @param {number} userId - ID пользователя
+     * @returns {Promise<Array>} Содержимое корзины
+     */
+    getCart: (userId) => makeRequest('GET', `/cart/${userId}`),
 
+    // Корзина
   /**
    * Добавить элемент в корзину
    * @param {number} userId - ID пользователя
-   * @param {Object} data - Данные элемента
-   * @param {number} data.menu_item_id - ID пункта меню
-   * @param {string} data.name_item - Название
-   * @param {number} data.item_price - Цена
-   * @param {number} data.quantity - Количество
-   * @returns {Promise<Object>} Добавленный элемент
+   * @param {Object} cartItem - Данные элемента корзины
+   * @returns {Promise<Object>} Результат добавления
    */
-  addToCart: (userId, data) => makeRequest('POST', `/cart/${userId}`, data),
+  addToCart: async (userId, cartItem) => {
+    try {
+      return await makeRequest('POST', `/cart/${userId}`, cartItem);
+    } catch (error) {
+      // Если ошибка связана с разными ресторанами, добавляем дополнительную информацию
+      if (error.message.includes('All items in the cart must be from the same restaurant')) {
+        const response = await error.response.json();
+        throw new Error(JSON.stringify(response)); // Передаём информацию об ошибке
+      }
+      throw error;
+    }
+  },
+
+  /**
+   * Очистить корзину пользователя
+   * @param {number} userId - ID пользователя
+   * @returns {Promise<Object>} Результат очистки
+   */
+  clearCart: (userId) => makeRequest('DELETE', `/cart/${userId}`),
 
   /**
    * Удалить элемент из корзины

@@ -6,7 +6,7 @@ import CartPage from './components/CartPage';
 import OrdersPage from './components/OrdersPage';
 import UsersPage from './components/UsersPage';
 import ReservationsPage from './components/ReservationsPage';
-import RestaurantsAdminPage from './components/RestaurantsAdminPage'; // Новый компонент
+import RestaurantsAdminPage from './components/RestaurantsAdminPage';
 
 function App() {
   return (
