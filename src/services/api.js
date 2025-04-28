@@ -3,8 +3,8 @@
  * Базовый URL: https://backend-rest-hrya.onrender.com
  */
 
-// const BASE_URL = 'https://backend-rest-hrya.onrender.com';
-const BASE_URL = 'http://127.0.0.1:3333';
+const BASE_URL = 'https://backend-rest-hrya.onrender.com';
+// const BASE_URL = 'http://127.0.0.1:3333';
 
 
 // Общая функция для выполнения запросов
