@@ -1,29 +1,58 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import RestaurantList from './components/RestaurantList';
+import MenuPage from './components/MenuPage';
+import CartPage from './components/CartPage';
+import OrdersPage from './components/OrdersPage';
+import UsersPage from './components/UsersPage';
+import ReservationsPage from './components/ReservationsPage';
+import RestaurantsAdminPage from './components/RestaurantsAdminPage'; // Новый компонент
 
 function App() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    // Проверяем, доступен ли Telegram Web Apps
-    if (window.Telegram && window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.ready(); // Инициализация
-      setUser(tg.initDataUnsafe?.user || null); // Получаем данные пользователя
-      tg.expand(); // Разворачиваем приложение на весь экран
-    } else {
-      console.log("Telegram Web Apps не доступен. Открой приложение через Telegram.");
-    }
-  }, []);
-
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h1>Мини-приложение для Telegram</h1>
-      {user ? (
-        <p>Привет, {user.first_name}!</p>
-      ) : (
-        <p>Запусти приложение через Telegram</p>
-      )}
-    </div>
+    <Router>
+      <div style={{ padding: '20px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+            borderBottom: '1px solid #ccc',
+            paddingBottom: '10px',
+          }}
+        >
+          <h1 style={{ margin: 0 }}>Ресторанное приложение</h1>
+          <div>
+            <Link to="/" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
+              Главная
+            </Link>
+            <Link to="/cart" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
+              Корзина
+            </Link>
+            <Link to="/orders" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
+              Заказы
+            </Link>
+            <Link to="/users" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
+              Пользователи
+            </Link>
+            <Link to="/admin/restaurants" style={{ textDecoration: 'none', color: '#007bff' }}>
+              Управление ресторанами
+            </Link>
+          </div>
+        </div>
+
+        <Routes>
+          <Route path="/" element={<RestaurantList />} />
+          <Route path="/restaurants/:restaurantId/menu" element={<MenuPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
+          <Route path="/admin/restaurants" element={<RestaurantsAdminPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
