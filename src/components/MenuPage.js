@@ -43,30 +43,7 @@ function MenuPage() {
       const response = await api.addToCart(userId, cartItem);
       alert('Добавлено в корзину: ' + response.message);
     } catch (error) {
-      try {
-        const errorData = JSON.parse(error.message);
-        if (errorData.action_required === 'clear_cart') {
-          const confirmClear = window.confirm(
-            `Ваша корзина содержит блюда из ресторана #${errorData.current_restaurant_id}. ` +
-            `Чтобы добавить блюдо из ресторана #${errorData.new_restaurant_id}, нужно очистить корзину. Очистить?`
-          );
-          if (confirmClear) {
-            await api.clearCart(userId);
-            const cartItem = {
-              menu_item_id: itemId,
-              name_item: item.name,
-              item_price: item.price,
-              quantity: 1,
-            };
-            const response = await api.addToCart(userId, cartItem);
-            alert('Корзина очищена и блюдо добавлено: ' + response.message);
-          }
-        } else {
-          throw error;
-        }
-      } catch (e) {
-        alert('Не удалось добавить в корзину: ' + error.message);
-      }
+      alert('Не удалось добавить в корзину: ' + error.message);
     } finally {
       setIsAdding((prev) => ({ ...prev, [itemId]: false }));
     }
@@ -121,7 +98,7 @@ function MenuPage() {
         image_url: newItemForm.image_url,
       };
       const response = await api.addMenuItem(restaurantId, newItemData);
-      setMenuItems((prev) => [...prev, response.menu_item]);
+      setMenuItems((prev) => [...prev, response.menu_item]); // Добавляем новый пункт с id
       setNewItemForm({ name: '', price: '', description: '', image_url: '' });
       alert('Пункт меню добавлен');
     } catch (error) {
@@ -219,7 +196,7 @@ function MenuPage() {
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
           {menuItems.map((item) => (
             <div
-              key={item.id || item.name}
+              key={item.id || item.name} // Временный ключ, если id отсутствует
               style={{
                 width: '200px',
                 margin: '10px',

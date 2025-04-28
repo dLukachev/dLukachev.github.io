@@ -139,43 +139,43 @@ export const api = {
   updateReservation: (restaurantId, userId, reservationId, data) => 
     makeRequest('PUT', `/restaurants/${restaurantId}/${userId}/tables/booking/${reservationId}`, data),
 
-    /**
-     * Удалить бронирование
-     * @param {number} restaurantId - ID ресторана
-     * @param {number} userId - ID пользователя
-     * @param {number} reservationId - ID бронирования
-     * @returns {Promise<Object>} Результат удаления
-     */
-    deleteReservation: (restaurantId, userId, reservationId) => 
-      makeRequest('DELETE', `/restaurants/${restaurantId}/${userId}/tables/booking/${reservationId}`),
-
-    // Корзина
-    /**
-     * Получить содержимое корзины пользователя
-     * @param {number} userId - ID пользователя
-     * @returns {Promise<Array>} Содержимое корзины
-     */
-    getCart: (userId) => makeRequest('GET', `/cart/${userId}`),
-
-    // Корзина
   /**
-   * Добавить элемент в корзину
+   * Удалить бронирование
+   * @param {number} restaurantId - ID ресторана
    * @param {number} userId - ID пользователя
-   * @param {Object} cartItem - Данные элемента корзины
-   * @returns {Promise<Object>} Результат добавления
+   * @param {number} reservationId - ID бронирования
+   * @returns {Promise<Object>} Результат удаления
    */
-  addToCart: async (userId, cartItem) => {
-    try {
-      return await makeRequest('POST', `/cart/${userId}`, cartItem);
-    } catch (error) {
-      // Если ошибка связана с разными ресторанами, добавляем дополнительную информацию
-      if (error.message.includes('All items in the cart must be from the same restaurant')) {
-        const response = await error.response.json();
-        throw new Error(JSON.stringify(response)); // Передаём информацию об ошибке
-      }
-      throw error;
+  deleteReservation: (restaurantId, userId, reservationId) => 
+    makeRequest('DELETE', `/restaurants/${restaurantId}/${userId}/tables/booking/${reservationId}`),
+
+  // Корзина
+  /**
+   * Получить содержимое корзины пользователя
+   * @param {number} userId - ID пользователя
+   * @returns {Promise<Array>} Содержимое корзины
+   */
+  getCart: (userId) => makeRequest('GET', `/cart/${userId}`),
+
+  // Корзина
+/**
+ * Добавить элемент в корзину
+ * @param {number} userId - ID пользователя
+ * @param {Object} cartItem - Данные элемента корзины
+ * @returns {Promise<Object>} Результат добавления
+ */
+addToCart: async (userId, cartItem) => {
+  try {
+    return await makeRequest('POST', `/cart/${userId}`, cartItem);
+  } catch (error) {
+    // Если ошибка связана с разными ресторанами, добавляем дополнительную информацию
+    if (error.message.includes('All items in the cart must be from the same restaurant')) {
+      const response = await error.response.json();
+      throw new Error(JSON.stringify(response)); // Передаём информацию об ошибке
     }
-  },
+    throw error;
+  }
+},
 
   /**
    * Очистить корзину пользователя

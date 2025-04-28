@@ -1,19 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
+import { api } from '../services/api';
 
 function CartPage() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isRemoving, setIsRemoving] = useState({});
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+
   const userId = '1102241880';
 
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const response = await api.getCart(userId);
-        setCartItems(response || []);
+        const data = await api.getCart(userId);
+        console.log('Данные корзины:', data);
+
+        // Проверяем, является ли data массивом
+        if (Array.isArray(data)) {
+          setCartItems(data);
+        } else {
+          // Если data — объект (например, { "cart": "Корзина пуста" }), устанавливаем пустой массив
+          setCartItems([]);
+        }
         setLoading(false);
       } catch (error) {
         setError('Не удалось загрузить корзину: ' + error.message);
@@ -26,38 +36,43 @@ function CartPage() {
   const handleRemoveFromCart = async (menuItemId) => {
     setIsRemoving((prev) => ({ ...prev, [menuItemId]: true }));
     try {
-      console.log(`Удаляем элемент ${menuItemId} из корзины пользователя ${userId}`);
       await api.removeFromCart(userId, menuItemId);
-      setCartItems((prev) => prev.filter((item) => item.menu_item_id !== menuItemId));
+      const updatedCart = await api.getCart(userId);
+      console.log('Обновлённые данные корзины:', updatedCart);
+
+      // Аналогичная проверка для обновлённых данных
+      if (Array.isArray(updatedCart)) {
+        setCartItems(updatedCart);
+      } else {
+        setCartItems([]);
+      }
       alert('Элемент удалён из корзины');
     } catch (error) {
-      console.error('Ошибка при удалении:', error);
       alert('Не удалось удалить элемент: ' + error.message);
     } finally {
       setIsRemoving((prev) => ({ ...prev, [menuItemId]: false }));
     }
   };
 
-  const handleClearCart = async () => {
-    try {
-      await api.clearCart(userId);
-      setCartItems([]);
-      alert('Корзина очищена');
-    } catch (error) {
-      alert('Не удалось очистить корзину: ' + error.message);
-    }
-  };
-
   const handleCreateOrder = async () => {
+    if (!cartItems || cartItems.length === 0) {
+      alert('Корзина пуста');
+      return;
+    }
+
+    setIsCreatingOrder(true);
     try {
+      const restaurantId = cartItems[0].restaurant_id || 1;
       const orderData = {
-        restaurant_id: cartItems[0]?.restaurant_id || 1,
+        restaurant_id: restaurantId,
       };
       const response = await api.createOrder(userId, orderData);
-      setCartItems([]);
       alert('Заказ создан: ' + response.message);
+      setCartItems([]);
     } catch (error) {
       alert('Не удалось создать заказ: ' + error.message);
+    } finally {
+      setIsCreatingOrder(false);
     }
   };
 
@@ -88,13 +103,13 @@ function CartPage() {
         </Link>
       </div>
       <h2>Корзина</h2>
-      {cartItems.length === 0 ? (
+      {(!cartItems || cartItems.length === 0) ? (
         <p>Корзина пуста</p>
       ) : (
         <div>
           {cartItems.map((item) => (
             <div
-              key={item.menu_item_id}
+              key={item.id}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -106,52 +121,40 @@ function CartPage() {
               }}
             >
               <div>
-                <p style={{ margin: '5px 0' }}>Название: {item.name_item}</p>
+                <h3 style={{ margin: 0 }}>{item.name_item}</h3>
                 <p style={{ margin: '5px 0' }}>Цена: {item.item_price} руб.</p>
                 <p style={{ margin: '5px 0' }}>Количество: {item.quantity}</p>
               </div>
               <button
-                onClick={() => handleRemoveFromCart(item.menu_item_id)}
-                disabled={isRemoving[item.menu_item_id]}
+                onClick={() => handleRemoveFromCart(item.id)}
+                disabled={isRemoving[item.id]}
                 style={{
                   padding: '5px 10px',
-                  backgroundColor: isRemoving[item.menu_item_id] ? '#ccc' : '#dc3545',
+                  backgroundColor: isRemoving[item.id] ? '#ccc' : '#dc3545',
                   color: 'white',
                   border: 'none',
                   borderRadius: '3px',
-                  cursor: isRemoving[item.menu_item_id] ? 'not-allowed' : 'pointer',
+                  cursor: isRemoving[item.id] ? 'not-allowed' : 'pointer',
                 }}
               >
-                {isRemoving[item.menu_item_id] ? 'Удаление...' : 'Удалить'}
+                {isRemoving[item.id] ? 'Удаление...' : 'Удалить'}
               </button>
             </div>
           ))}
-          <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-            <button
-              onClick={handleClearCart}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-            >
-              Очистить корзину
-            </button>
+          <div style={{ marginTop: '20px' }}>
             <button
               onClick={handleCreateOrder}
+              disabled={isCreatingOrder}
               style={{
                 padding: '10px 20px',
-                backgroundColor: '#28a745',
+                backgroundColor: isCreatingOrder ? '#ccc' : '#28a745',
                 color: 'white',
                 border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
+                borderRadius: '3px',
+                cursor: isCreatingOrder ? 'not-allowed' : 'pointer',
               }}
             >
-              Создать заказ
+              {isCreatingOrder ? 'Создание заказа...' : 'Создать заказ'}
             </button>
           </div>
         </div>
