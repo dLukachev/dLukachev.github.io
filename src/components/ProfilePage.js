@@ -69,7 +69,7 @@ function ProfilePage() {
   };
 
   if (authLoading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Авторизация...</p>;
+    return <p className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>Авторизация...</p>;
   }
 
   if (authError) {
@@ -78,7 +78,7 @@ function ProfilePage() {
 
   if (!user || !user.id) {
     return (
-      <p className="text-center text-[var(--tg-theme-text-color)]">
+      <p className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
@@ -86,22 +86,24 @@ function ProfilePage() {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Профиль</h2>
+      <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--tg-theme-text-color)' }}>Профиль</h2>
 
       {/* Информация о пользователе */}
       <div className="mb-6 p-3 bg-white rounded-lg shadow-md">
-        <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Информация о пользователе</h3>
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+          Информация о пользователе
+        </h3>
         <div className="space-y-1">
-          <p className="text-[var(--tg-theme-text-color)]">
+          <p style={{ color: 'var(--tg-theme-text-color)' }}>
             <span className="font-bold">Имя:</span> {user.firstName || 'Не указано'}
           </p>
-          <p className="text-[var(--tg-theme-text-color)]">
+          <p style={{ color: 'var(--tg-theme-text-color)' }}>
             <span className="font-bold">Email:</span> {user.email || 'Не указано'}
           </p>
-          <p className="text-[var(--tg-theme-text-color)]">
+          <p style={{ color: 'var(--tg-theme-text-color)' }}>
             <span className="font-bold">Бонусные баллы:</span> {user.bonus_points || 0}
           </p>
-          <p className="text-[var(--tg-theme-text-color)]">
+          <p style={{ color: 'var(--tg-theme-text-color)' }}>
             <span className="font-bold">Роль:</span> {user.role || 'Пользователь'}
           </p>
           {user.photo_url && (
@@ -115,121 +117,135 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Создание пользователей (только для админов) */}
-      {user.role === 'admin' && (
-        <>
-          <div className="mb-6 p-3 bg-white rounded-lg shadow-md">
-            <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Создать нового пользователя</h3>
-            <div className="space-y-2">
-              <input
-                type="text"
-                name="id"
-                placeholder="ID пользователя"
-                value={newUser.id}
-                onChange={handleInputChange}
-                className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                style={{ borderColor: 'var(--tg-theme-hint-color)' }}
-              />
-              <input
-                type="text"
-                name="name"
-                placeholder="Имя"
-                value={newUser.name}
-                onChange={handleInputChange}
-                className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                style={{ borderColor: 'var(--tg-theme-hint-color)' }}
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={newUser.email}
-                onChange={handleInputChange}
-                className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                style={{ borderColor: 'var(--tg-theme-hint-color)' }}
-              />
-              <input
-                type="number"
-                name="bonus_points"
-                placeholder="Бонусные баллы"
-                value={newUser.bonus_points}
-                onChange={handleInputChange}
-                className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                style={{ borderColor: 'var(--tg-theme-hint-color)' }}
-              />
-              <input
-                type="text"
-                name="photo_url"
-                placeholder="URL фото (опционально)"
-                value={newUser.photo_url}
-                onChange={handleInputChange}
-                className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                style={{ borderColor: 'var(--tg-theme-hint-color)' }}
-              />
-              <button
-                onClick={handleCreateUser}
-                className="w-full px-4 py-2 rounded-lg shadow-md"
-                style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
+      {/* Создание пользователей */}
+      <div className="mb-6 p-3 bg-white rounded-lg shadow-md">
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+          Создать нового пользователя
+        </h3>
+        <div className="space-y-2">
+          <input
+            type="text"
+            name="id"
+            placeholder="ID пользователя"
+            value={newUser.id}
+            onChange={handleInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+          />
+          <input
+            type="text"
+            name="name"
+            placeholder="Имя"
+            value={newUser.name}
+            onChange={handleInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={newUser.email}
+            onChange={handleInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+          />
+          <input
+            type="number"
+            name="bonus_points"
+            placeholder="Бонусные баллы"
+            value={newUser.bonus_points}
+            onChange={handleInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+          />
+          <input
+            type="text"
+            name="photo_url"
+            placeholder="URL фото (опционально)"
+            value={newUser.photo_url}
+            onChange={handleInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+          />
+          <button
+            onClick={handleCreateUser}
+            className="w-full px-4 py-2 rounded-lg shadow-md"
+            style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
+          >
+            Создать пользователя
+          </button>
+        </div>
+      </div>
+
+      {/* Список пользователей */}
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+          Список пользователей
+        </h3>
+        {loading ? (
+          <p className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>
+            Загрузка пользователей...
+          </p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : users.length === 0 ? (
+          <p className="text-center" style={{ color: 'var(--tg-theme-hint-color)' }}>
+            Пользователей нет
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {users.map((u) => (
+              <div
+                key={u.id}
+                className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
               >
-                Создать пользователя
-              </button>
-            </div>
-          </div>
-
-          {/* Список пользователей */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Список пользователей</h3>
-            {loading ? (
-              <p className="text-center text-[var(--tg-theme-text-color)]">Загрузка пользователей...</p>
-            ) : error ? (
-              <p className="text-center text-red-500">{error}</p>
-            ) : users.length === 0 ? (
-              <p className="text-[var(--tg-theme-hint-color)] text-center">Пользователей нет</p>
-            ) : (
-              <div className="space-y-4">
-                {users.map((u) => (
-                  <div
-                    key={u.id}
-                    className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
-                  >
-                    <div className="space-y-1">
-                      <p className="font-bold text-[var(--tg-theme-text-color)]">ID: {u.id}</p>
-                      <p className="text-sm text-[var(--tg-theme-hint-color)]">Имя: {u.name}</p>
-                      <p className="text-sm text-[var(--tg-theme-hint-color)]">Email: {u.email}</p>
-                      <p className="text-sm text-[var(--tg-theme-hint-color)]">Бонусные баллы: {u.bonus_points}</p>
-                      {u.photo_url && (
-                        <img
-                          src={u.photo_url}
-                          alt={u.name}
-                          className="w-12 h-12 object-cover rounded-md"
-                          onError={(e) => (e.target.src = 'https://placehold.co/50x50')}
-                        />
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleDeleteUser(u.id)}
-                      disabled={isDeleting[u.id]}
-                      className="p-2 rounded-md disabled:opacity-50"
-                      style={{
-                        backgroundColor: isDeleting[u.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
-                        color: 'var(--tg-theme-button-text-color)',
-                      }}
-                    >
-                      <FaTrash size={16} />
-                    </button>
-                  </div>
-                ))}
+                <div className="space-y-1">
+                  <p className="font-bold" style={{ color: 'var(--tg-theme-text-color)' }}>
+                    ID: {u.id}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color)' }}>
+                    Имя: {u.name}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color)' }}>
+                    Email: {u.email}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color)' }}>
+                    Бонусные баллы: {u.bonus_points}
+                  </p>
+                  {u.photo_url && (
+                    <img
+                      src={u.photo_url}
+                      alt={u.name}
+                      className="w-12 h-12 object-cover rounded-md"
+                      onError={(e) => (e.target.src = 'https://placehold.co/50x50')}
+                    />
+                  )}
+                </div>
+                <button
+                  onClick={() => handleDeleteUser(u.id)}
+                  disabled={isDeleting[u.id]}
+                  className="p-2 rounded-md disabled:opacity-50"
+                  style={{
+                    backgroundColor: isDeleting[u.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
+                    color: 'var(--tg-theme-button-text-color)',
+                  }}
+                >
+                  <FaTrash size={16} />
+                </button>
               </div>
-            )}
+            ))}
           </div>
+        )}
+      </div>
 
-          {/* Админка ресторанов */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Управление ресторанами</h3>
-            <RestaurantsAdminPage />
-          </div>
-        </>
-      )}
+      {/* Админка ресторанов */}
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+          Управление ресторанами
+        </h3>
+        <RestaurantsAdminPage />
+      </div>
     </div>
   );
 }
