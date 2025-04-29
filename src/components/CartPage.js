@@ -1,166 +1,183 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
+import api from '../services/api';
 
 function CartPage() {
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isRemoving, setIsRemoving] = useState({});
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+    const { user, loading: authLoading } = useContext(AuthContext);
+    const [cartItems, setCartItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [isRemoving, setIsRemoving] = useState({});
+    const [orderType, setOrderType] = useState('DINE_IN');
 
-  const userId = '1102241880';
+    useEffect(() => {
+        if (!user) return; // Ждем авторизацию
 
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const data = await api.getCart(userId);
-        console.log('Данные корзины:', data);
+        const fetchCart = async () => {
+            try {
+                const response = await api.getCart(user.id);
+                if (Array.isArray(response)) {
+                    setCartItems(response);
+                } else if (response.cart === 'Корзина пуста') {
+                    setCartItems([]);
+                } else {
+                    setError(response.error || 'Неизвестная ошибка при загрузке корзины');
+                    setCartItems([]);
+                }
+                setLoading(false);
+            } catch (error) {
+                setError(error.message);
+                setLoading(false);
+            }
+        };
+        fetchCart();
+    }, [user]);
 
-        // Проверяем, является ли data массивом
-        if (Array.isArray(data)) {
-          setCartItems(data);
-        } else {
-          // Если data — объект (например, { "cart": "Корзина пуста" }), устанавливаем пустой массив
-          setCartItems([]);
+    const handleRemoveFromCart = async (menuItemId) => {
+        setIsRemoving((prev) => ({ ...prev, [menuItemId]: true }));
+        try {
+            await api.removeFromCart(user.id, menuItemId);
+            const response = await api.getCart(user.id);
+            if (Array.isArray(response)) {
+                setCartItems(response);
+            } else if (response.cart === 'Корзина пуста') {
+                setCartItems([]);
+            } else {
+                setError(response.error || 'Неизвестная ошибка при загрузке корзины');
+                setCartItems([]);
+            }
+            alert('Элемент удалён из корзины');
+        } catch (error) {
+            alert('Не удалось удалить элемент: ' + error.message);
+        } finally {
+            setIsRemoving((prev) => ({ ...prev, [menuItemId]: false }));
         }
-        setLoading(false);
-      } catch (error) {
-        setError('Не удалось загрузить корзину: ' + error.message);
-        setLoading(false);
-      }
     };
-    fetchCart();
-  }, []);
 
-  const handleRemoveFromCart = async (menuItemId) => {
-    setIsRemoving((prev) => ({ ...prev, [menuItemId]: true }));
-    try {
-      await api.removeFromCart(userId, menuItemId);
-      const updatedCart = await api.getCart(userId);
-      console.log('Обновлённые данные корзины:', updatedCart);
+    const handleCreateOrder = async () => {
+        try {
+            if (cartItems.length === 0) {
+                alert('Корзина пуста. Добавьте элементы перед созданием заказа.');
+                return;
+            }
 
-      // Аналогичная проверка для обновлённых данных
-      if (Array.isArray(updatedCart)) {
-        setCartItems(updatedCart);
-      } else {
-        setCartItems([]);
-      }
-      alert('Элемент удалён из корзины');
-    } catch (error) {
-      alert('Не удалось удалить элемент: ' + error.message);
-    } finally {
-      setIsRemoving((prev) => ({ ...prev, [menuItemId]: false }));
-    }
-  };
+            const orderData = {
+                restaurant_id: cartItems[0]?.restaurant_id || 1,
+                order_type: orderType,
+            };
+            const response = await api.createOrder(user.id, orderData);
+            setCartItems([]);
+            alert('Заказ создан: ' + response.message);
+        } catch (error) {
+            alert('Не удалось создать заказ: ' + error.message);
+        }
+    };
 
-  const handleCreateOrder = async () => {
-    if (!cartItems || cartItems.length === 0) {
-      alert('Корзина пуста');
-      return;
+    if (authLoading) {
+        return <p>Авторизация...</p>;
     }
 
-    setIsCreatingOrder(true);
-    try {
-      const restaurantId = cartItems[0].restaurant_id || 1;
-      const orderData = {
-        restaurant_id: restaurantId,
-      };
-      const response = await api.createOrder(userId, orderData);
-      alert('Заказ создан: ' + response.message);
-      setCartItems([]);
-    } catch (error) {
-      alert('Не удалось создать заказ: ' + error.message);
-    } finally {
-      setIsCreatingOrder(false);
+    if (!user) {
+        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
     }
-  };
 
-  if (loading) {
-    return <p>Загрузка корзины...</p>;
-  }
+    if (loading) {
+        return <p>Загрузка корзины...</p>;
+    }
 
-  if (error) {
-    return <p>{error}</p>;
-  }
+    if (error) {
+        return <p>{error}</p>;
+    }
 
-  return (
-    <div>
-      <div style={{ marginBottom: '20px' }}>
-        <Link to="/">
-          <button
-            style={{
-              padding: '5px 10px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '3px',
-              cursor: 'pointer',
-            }}
-          >
-            Назад
-          </button>
-        </Link>
-      </div>
-      <h2>Корзина</h2>
-      {(!cartItems || cartItems.length === 0) ? (
-        <p>Корзина пуста</p>
-      ) : (
+    return (
         <div>
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                margin: '10px 0',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '5px',
-              }}
-            >
-              <div>
-                <h3 style={{ margin: 0 }}>{item.name_item}</h3>
-                <p style={{ margin: '5px 0' }}>Цена: {item.item_price} руб.</p>
-                <p style={{ margin: '5px 0' }}>Количество: {item.quantity}</p>
-              </div>
-              <button
-                onClick={() => handleRemoveFromCart(item.id)}
-                disabled={isRemoving[item.id]}
-                style={{
-                  padding: '5px 10px',
-                  backgroundColor: isRemoving[item.id] ? '#ccc' : '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '3px',
-                  cursor: isRemoving[item.id] ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isRemoving[item.id] ? 'Удаление...' : 'Удалить'}
-              </button>
+            <div style={{ marginBottom: '20px' }}>
+                <Link to="/">
+                    <button
+                        style={{
+                            padding: '5px 10px',
+                            backgroundColor: '#6c757d',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '3px',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Назад
+                    </button>
+                </Link>
             </div>
-          ))}
-          <div style={{ marginTop: '20px' }}>
-            <button
-              onClick={handleCreateOrder}
-              disabled={isCreatingOrder}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: isCreatingOrder ? '#ccc' : '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '3px',
-                cursor: isCreatingOrder ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {isCreatingOrder ? 'Создание заказа...' : 'Создать заказ'}
-            </button>
-          </div>
+            <h2>Корзина</h2>
+            {cartItems.length === 0 ? (
+                <p>Корзина пуста</p>
+            ) : (
+                <div>
+                    {cartItems.map((item) => (
+                        <div
+                            key={item.menu_item_id}
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                margin: '10px 0',
+                                padding: '10px',
+                                border: '1px solid #ccc',
+                                borderRadius: '5px',
+                            }}
+                        >
+                            <div>
+                                <p style={{ margin: '5px 0' }}>Название: {item.name}</p>
+                                <p style={{ margin: '5px 0' }}>Цена: {item.price} руб.</p>
+                                <p style={{ margin: '5px 0' }}>Количество: {item.quantity}</p>
+                            </div>
+                            <button
+                                onClick={() => handleRemoveFromCart(item.menu_item_id)}
+                                disabled={isRemoving[item.menu_item_id]}
+                                style={{
+                                    padding: '5px 10px',
+                                    backgroundColor: isRemoving[item.menu_item_id] ? '#ccc' : '#dc3545',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '3px',
+                                    cursor: isRemoving[item.menu_item_id] ? 'not-allowed' : 'pointer',
+                                }}
+                            >
+                                {isRemoving[item.menu_item_id] ? 'Удаление...' : 'Удалить'}
+                            </button>
+                        </div>
+                    ))}
+                    <div style={{ marginTop: '20px', marginBottom: '10px' }}>
+                        <label htmlFor="orderType">Тип заказа: </label>
+                        <select
+                            id="orderType"
+                            value={orderType}
+                            onChange={(e) => setOrderType(e.target.value)}
+                            style={{ padding: '5px', marginLeft: '10px', borderRadius: '3px' }}
+                        >
+                            <option value="DINE_IN">Обед в ресторане</option>
+                            <option value="DELIVERY">Доставка</option>
+                            <option value="PICKUP">Самовывоз</option>
+                        </select>
+                    </div>
+                    <button
+                        onClick={handleCreateOrder}
+                        style={{
+                            marginTop: '10px',
+                            padding: '10px 20px',
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Создать заказ
+                    </button>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 }
 
 export default CartPage;
