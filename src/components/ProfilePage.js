@@ -23,36 +23,42 @@ function ProfilePage() {
   const [isDeletingMenuItem, setIsDeletingMenuItem] = useState({});
 
   useEffect(() => {
+    console.log('User from AuthContext:', user);
     if (!user) return;
 
     const fetchData = async () => {
       try {
-        // Загрузка пользователей
+        console.log('Fetching users...');
         const usersData = await api.getUsers();
-        setUsers(usersData || []); // Адаптировано: API возвращает массив, а не { users: [...] }
+        console.log('Users data:', usersData);
+        setUsers(usersData || []);
 
-        // Загрузка ресторанов
+        console.log('Fetching restaurants with params:', { user_id: user.id, first_name: user.firstName });
         const restaurantsData = await api.getRestaurants({
           user_id: user.id,
           first_name: user.firstName,
         });
-        setRestaurants(restaurantsData || []); // Адаптировано: API возвращает массив, а не [{ data: {...} }, ...]
+        console.log('Restaurants data:', restaurantsData);
+        setRestaurants(restaurantsData || []);
 
-        // Загрузка меню для каждого ресторана
         const menuData = {};
         for (const restaurant of restaurantsData) {
+          console.log(`Fetching menu for restaurant ${restaurant.id}...`);
           try {
             const menuResponse = await api.getMenu(restaurant.id);
-            menuData[restaurant.id] = menuResponse.menu || []; // Адаптировано: API возвращает { menu: [...] }
+            console.log(`Menu for restaurant ${restaurant.id}:`, menuResponse);
+            menuData[restaurant.id] = menuResponse.menu || [];
           } catch (error) {
             console.error(`Ошибка загрузки меню для ресторана ${restaurant.id}:`, error);
             menuData[restaurant.id] = [];
           }
         }
+        console.log('Menu data:', menuData);
         setMenuItems(menuData);
 
         setLoading(false);
       } catch (error) {
+        console.error('Fetch data error:', error);
         setError('Не удалось загрузить данные: ' + error.message);
         setLoading(false);
       }
@@ -66,28 +72,36 @@ function ProfilePage() {
   };
 
   const handleCreateUser = async () => {
+    setIsAdding(true); // Добавлено для блокировки кнопки
     try {
       const userData = {
         ...newUser,
         id: parseInt(newUser.id),
         bonus_points: parseFloat(newUser.bonus_points) || 0,
       };
+      console.log('Creating user with data:', userData);
       const response = await api.createUser(userData);
-      setUsers((prev) => [...prev, response]); // Адаптировано: API возвращает объект пользователя
+      console.log('Create user response:', response);
+      setUsers((prev) => [...prev, response]);
       setNewUser({ id: '', name: '', email: '', bonus_points: 0, photo_url: '' });
       alert('Пользователь создан');
     } catch (error) {
+      console.error('Create user error:', error);
       alert('Не удалось создать пользователя: ' + error.message);
+    } finally {
+      setIsAdding(false);
     }
   };
 
   const handleDeleteUser = async (userId) => {
     setIsDeleting((prev) => ({ ...prev, [userId]: true }));
     try {
+      console.log('Deleting user:', userId);
       await api.deleteUser(userId);
       setUsers((prev) => prev.filter((user) => user.id !== userId));
       alert('Пользователь удалён');
     } catch (error) {
+      console.error('Delete user error:', error);
       alert('Не удалось удалить пользователя: ' + error.message);
     } finally {
       setIsDeleting((prev) => ({ ...prev, [userId]: false }));
@@ -97,12 +111,15 @@ function ProfilePage() {
   const handleAddRestaurant = async () => {
     setIsAdding(true);
     try {
+      console.log('Adding restaurant with address:', newRestaurant);
       const response = await api.addRestaurant({ address: newRestaurant });
-      setRestaurants((prev) => [...prev, response]); // Адаптировано: API возвращает { id, address }
+      console.log('Add restaurant response:', response);
+      setRestaurants((prev) => [...prev, response]);
       setMenuItems((prev) => ({ ...prev, [response.id]: [] }));
       setNewRestaurant('');
       alert('Ресторан добавлен');
     } catch (error) {
+      console.error('Add restaurant error:', error);
       alert('Не удалось добавить ресторан: ' + error.message);
     } finally {
       setIsAdding(false);
@@ -112,6 +129,7 @@ function ProfilePage() {
   const handleDeleteRestaurant = async (restaurantId) => {
     setIsDeleting((prev) => ({ ...prev, [restaurantId]: true }));
     try {
+      console.log('Deleting restaurant:', restaurantId);
       await api.deleteRestaurant(restaurantId);
       setRestaurants((prev) => prev.filter((restaurant) => restaurant.id !== restaurantId));
       setMenuItems((prev) => {
@@ -121,6 +139,7 @@ function ProfilePage() {
       });
       alert('Ресторан удалён');
     } catch (error) {
+      console.error('Delete restaurant error:', error);
       alert('Не удалось удалить ресторан: ' + error.message);
     } finally {
       setIsDeleting((prev) => ({ ...prev, [restaurantId]: false }));
@@ -130,6 +149,7 @@ function ProfilePage() {
   const handleDeleteMenuItem = async (restaurantId, menuItemId) => {
     setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: true }));
     try {
+      console.log('Deleting menu item:', { restaurantId, menuItemId });
       await api.deleteMenuItem(restaurantId, menuItemId);
       setMenuItems((prev) => ({
         ...prev,
@@ -137,11 +157,14 @@ function ProfilePage() {
       }));
       alert('Элемент меню удалён');
     } catch (error) {
+      console.error('Delete menu item error:', error);
       alert('Не удалось удалить элемент меню: ' + error.message);
     } finally {
       setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: false }));
     }
   };
+
+  console.log('Rendering ProfilePage with state:', { authLoading, authError, user, loading, error, users, restaurants, menuItems });
 
   if (authLoading) {
     return <p className="text-center" style={{ color: '#ffffff' }}>Авторизация...</p>;
@@ -245,8 +268,9 @@ function ProfilePage() {
           />
           <button
             onClick={handleCreateUser}
-            className="w-full px-4 py-2 rounded-lg shadow-md"
-            style={{ backgroundColor: '#007bff', color: '#ffffff' }}
+            disabled={isAdding}
+            className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+            style={{ backgroundColor: isAdding ? '#aaaaaa' : '#007bff', color: '#ffffff' }}
           >
             Создать пользователя
           </button>
