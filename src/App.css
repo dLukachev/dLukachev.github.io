@@ -52,7 +52,7 @@ button.bg-secondary {
 input,
 select {
   background-color: #2a2a2a;
-  color: #ffffff;
+  color: #ffffff; /* Явно белый текст */
   border: 1px solid #444;
   padding: 8px;
   border-radius: 6px;
@@ -60,11 +60,13 @@ select {
   box-sizing: border-box;
 }
 
+/* Placeholder текст */
 input::placeholder,
 select::placeholder {
-  color: #b0b0b0;
+  color: #b0b0b0; /* Серый для placeholder */
 }
 
+/* Фокус для полей ввода */
 input:focus,
 select:focus {
   outline: none;
@@ -104,6 +106,13 @@ select:focus {
 /* Стили для карточек */
 .bg-white {
   background-color: #2a2a2a; /* Тёмный фон для карточек */
+  color: #ffffff; /* Светлый текст */
+}
+
+/* Стили для внутренних элементов карточек */
+.bg-white p,
+.bg-white span {
+  color: #ffffff; /* Все тексты внутри карточек белые */
 }
 
 /* Стили для заголовков */
@@ -120,4 +129,15 @@ ul {
 /* Стили для текста ошибок */
 .text-red-500 {
   color: #ef4444;
+}
+
+/* Стили для элементов внутри списка (например, пункты меню) */
+.bg-gray-100 {
+  background-color: #2a2a2a; /* Тёмный фон для вложенных элементов */
+  color: #ffffff; /* Светлый текст */
+}
+
+/* Убедимся, что все тексты внутри .text-hint белые, если не указано иное */
+.text-hint {
+  color: #b0b0b0 !important; /* Приоритет для серого текста */
 }
