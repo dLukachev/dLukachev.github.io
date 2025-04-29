@@ -1,54 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Restaurant Mini-App</title>
-    <!-- Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React and ReactDOM CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
-    <!-- React Router CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/react-router-dom@6.4.3/dist/umd/react-router-dom.min.js"></script>
-    <!-- Babel for JSX -->
-    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.4/babel.min.js"></script>
-  </head>
-  <body class="bg-white min-h-screen font-sans">
-    <div id="root"></div>
-    <script>
-      (function(){
-        function c(){
-          var b=a.contentDocument||a.contentWindow.document;
-          if(b){
-            var d=b.createElement('script');
-            d.innerHTML="window.__CF$cv$params={r:'937f30275a49bfae',t:'MTc0NTkzMzc4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-            b.getElementsByTagName('head')[0].appendChild(d)
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Restaurant Mini-App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-[var(--tg-theme-bg-color)] min-h-screen font-sans text-[var(--tg-theme-text-color)]">
+  <div id="root"></div>
+  <script>
+    (function(){
+      function c(){
+        var b=a.contentDocument||a.contentWindow.document;
+        if(b){
+          var d=b.createElement('script');
+          d.innerHTML="window.__CF$cv$params={r:'937f30275a49bfae',t:'MTc0NTkzMzc4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+          b.getElementsByTagName('head')[0].appendChild(d)
+        }
+      }
+      if(document.body){
+        var a=document.createElement('iframe');
+        a.height=1;
+        a.width=1;
+        a.style.position='absolute';
+        a.style.top=0;
+        a.style.left=0;
+        a.style.border='none';
+        a.style.visibility='hidden';
+        document.body.appendChild(a);
+        if('loading'!==document.readyState)c();
+        else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);
+        else{
+          var e=document.onreadystatechange||function(){};
+          document.onreadystatechange=function(b){
+            e(b);
+            'loading'!==document.readyState&&(document.onreadystatechange=e,c())
           }
         }
-        if(document.body){
-          var a=document.createElement('iframe');
-          a.height=1;
-          a.width=1;
-          a.style.position='absolute';
-          a.style.top=0;
-          a.style.left=0;
-          a.style.border='none';
-          a.style.visibility='hidden';
-          document.body.appendChild(a);
-          if('loading'!==document.readyState)c();
-          else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);
-          else{
-            var e=document.onreadystatechange||function(){};
-            document.onreadystatechange=function(b){
-              e(b);
-              'loading'!==document.readyState&&(document.onreadystatechange=e,c())
-            }
-          }
-        }
-      })();
-    </script>
-  </body>
+      }
+    })();
+  </script>
+</body>
 </html>

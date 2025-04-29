@@ -1,62 +1,55 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext'; // Импортируем AuthProvider
-import RestaurantList from './components/RestaurantList';
-import MenuPage from './components/MenuPage';
-import CartPage from './components/CartPage';
-import OrdersPage from './components/OrdersPage';
-import UsersPage from './components/UsersPage';
-import ReservationsPage from './components/ReservationsPage';
-import RestaurantsAdminPage from './components/RestaurantsAdminPage';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import BottomNav from './BottomNav';
+import RestaurantList from './RestaurantList';
+import CartPage from './CartPage';
+import MenuPage from './MenuPage';
+import UsersPage from './UsersPage';
+import OrdersPage from './OrdersPage';
+import RestaurantsAdminPage from './RestaurantsAdminPage';
+import ReservationsPage from './ReservationsPage';
+import { AuthProvider } from './context/AuthContext';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+
+  React.useEffect(() => {
+    if (window.Telegram && window.Telegram.WebApp) {
+      const backButton = window.Telegram.WebApp.BackButton;
+      if (['/', '/cart', '/orders', '/profile'].includes(location.pathname)) {
+        backButton.hide();
+      } else {
+        backButton.show();
+        backButton.onClick(() => {
+          window.history.back();
+        });
+      }
+    }
+  }, [location]);
+
   return (
-    <AuthProvider> {/* Оборачиваем всё приложение в AuthProvider */}
-      <Router>
-        <div style={{ padding: '20px' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px',
-              borderBottom: '1px solid #ccc',
-              paddingBottom: '10px',
-            }}
-          >
-            <h1 style={{ margin: 0 }}>Ресторанное приложение</h1>
-            <div>
-              <Link to="/" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
-                Главная
-              </Link>
-              <Link to="/cart" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
-                Корзина
-              </Link>
-              <Link to="/orders" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
-                Заказы
-              </Link>
-              <Link to="/users" style={{ marginRight: '20px', textDecoration: 'none', color: '#007bff' }}>
-                Пользователи
-              </Link>
-              <Link to="/admin/restaurants" style={{ textDecoration: 'none', color: '#007bff' }}>
-                Управление ресторанами
-              </Link>
-            </div>
-          </div>
-
-          <Routes>
-            <Route path="/" element={<RestaurantList />} />
-            <Route path="/restaurants/:restaurantId/menu" element={<MenuPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
-            <Route path="/admin/restaurants" element={<RestaurantsAdminPage />} />
-          </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+    <div className="min-h-screen pb-16" style={{ backgroundColor: 'var(--tg-theme-bg-color)' }}>
+      <Routes>
+        <Route path="/" element={<RestaurantList />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/restaurants/:restaurantId/menu" element={<MenuPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/restaurants-admin" element={<RestaurantsAdminPage />} />
+        <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
+        <Route path="/profile" element={<div className="p-4">Профиль (в разработке)</div>} />
+      </Routes>
+      <BottomNav />
+    </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
