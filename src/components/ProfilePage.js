@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
-import RestaurantsAdminPage from './RestaurantsAdminPage';
 import { FaTrash } from 'react-icons/fa';
 
 function ProfilePage() {
@@ -14,27 +13,54 @@ function ProfilePage() {
     photo_url: '',
   });
   const [users, setUsers] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [menuItems, setMenuItems] = useState({});
+  const [newRestaurant, setNewRestaurant] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
   const [isDeleting, setIsDeleting] = useState({});
+  const [isDeletingMenuItem, setIsDeletingMenuItem] = useState({});
 
   useEffect(() => {
     if (!user) return;
 
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.getUsers();
-        setUsers(response.users || []);
+        // Загрузка пользователей
+        const usersData = await api.getUsers();
+        setUsers(usersData || []); // Адаптировано: API возвращает массив, а не { users: [...] }
+
+        // Загрузка ресторанов
+        const restaurantsData = await api.getRestaurants({
+          user_id: user.id,
+          first_name: user.firstName,
+        });
+        setRestaurants(restaurantsData || []); // Адаптировано: API возвращает массив, а не [{ data: {...} }, ...]
+
+        // Загрузка меню для каждого ресторана
+        const menuData = {};
+        for (const restaurant of restaurantsData) {
+          try {
+            const menuResponse = await api.getMenu(restaurant.id);
+            menuData[restaurant.id] = menuResponse.menu || []; // Адаптировано: API возвращает { menu: [...] }
+          } catch (error) {
+            console.error(`Ошибка загрузки меню для ресторана ${restaurant.id}:`, error);
+            menuData[restaurant.id] = [];
+          }
+        }
+        setMenuItems(menuData);
+
         setLoading(false);
       } catch (error) {
-        setError('Не удалось загрузить пользователей: ' + error.message);
+        setError('Не удалось загрузить данные: ' + error.message);
         setLoading(false);
       }
     };
-    fetchUsers();
+    fetchData();
   }, [user]);
 
-  const handleInputChange = (e) => {
+  const handleUserInputChange = (e) => {
     const { name, value } = e.target;
     setNewUser((prev) => ({ ...prev, [name]: value }));
   };
@@ -47,7 +73,7 @@ function ProfilePage() {
         bonus_points: parseFloat(newUser.bonus_points) || 0,
       };
       const response = await api.createUser(userData);
-      setUsers((prev) => [...prev, response.user]);
+      setUsers((prev) => [...prev, response]); // Адаптировано: API возвращает объект пользователя
       setNewUser({ id: '', name: '', email: '', bonus_points: 0, photo_url: '' });
       alert('Пользователь создан');
     } catch (error) {
@@ -68,42 +94,91 @@ function ProfilePage() {
     }
   };
 
+  const handleAddRestaurant = async () => {
+    setIsAdding(true);
+    try {
+      const response = await api.addRestaurant({ address: newRestaurant });
+      setRestaurants((prev) => [...prev, response]); // Адаптировано: API возвращает { id, address }
+      setMenuItems((prev) => ({ ...prev, [response.id]: [] }));
+      setNewRestaurant('');
+      alert('Ресторан добавлен');
+    } catch (error) {
+      alert('Не удалось добавить ресторан: ' + error.message);
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleDeleteRestaurant = async (restaurantId) => {
+    setIsDeleting((prev) => ({ ...prev, [restaurantId]: true }));
+    try {
+      await api.deleteRestaurant(restaurantId);
+      setRestaurants((prev) => prev.filter((restaurant) => restaurant.id !== restaurantId));
+      setMenuItems((prev) => {
+        const newMenuItems = { ...prev };
+        delete newMenuItems[restaurantId];
+        return newMenuItems;
+      });
+      alert('Ресторан удалён');
+    } catch (error) {
+      alert('Не удалось удалить ресторан: ' + error.message);
+    } finally {
+      setIsDeleting((prev) => ({ ...prev, [restaurantId]: false }));
+    }
+  };
+
+  const handleDeleteMenuItem = async (restaurantId, menuItemId) => {
+    setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: true }));
+    try {
+      await api.deleteMenuItem(restaurantId, menuItemId);
+      setMenuItems((prev) => ({
+        ...prev,
+        [restaurantId]: prev[restaurantId].filter((item) => item.id !== menuItemId),
+      }));
+      alert('Элемент меню удалён');
+    } catch (error) {
+      alert('Не удалось удалить элемент меню: ' + error.message);
+    } finally {
+      setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: false }));
+    }
+  };
+
   if (authLoading) {
-    return <p className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>Авторизация...</p>;
+    return <p className="text-center" style={{ color: '#ffffff' }}>Авторизация...</p>;
   }
 
   if (authError) {
-    return <p className="text-center text-red-500">Ошибка авторизации: {authError}</p>;
+    return <p className="text-center" style={{ color: '#ff0000' }}>Ошибка авторизации: {authError}</p>;
   }
 
   if (!user || !user.id) {
     return (
-      <p className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>
+      <p className="text-center" style={{ color: '#ffffff' }}>
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
   }
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--tg-theme-text-color)' }}>Профиль</h2>
+    <div className="p-4" style={{ backgroundColor: '#000000' }}>
+      <h2 className="text-xl font-bold mb-4" style={{ color: '#ffffff' }}>Профиль</h2>
 
       {/* Информация о пользователе */}
-      <div className="mb-6 p-3 bg-white rounded-lg shadow-md">
-        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+      <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Информация о пользователе
         </h3>
         <div className="space-y-1">
-          <p style={{ color: 'var(--tg-theme-text-color)' }}>
+          <p style={{ color: '#ffffff' }}>
             <span className="font-bold">Имя:</span> {user.firstName || 'Не указано'}
           </p>
-          <p style={{ color: 'var(--tg-theme-text-color)' }}>
+          <p style={{ color: '#ffffff' }}>
             <span className="font-bold">Email:</span> {user.email || 'Не указано'}
           </p>
-          <p style={{ color: 'var(--tg-theme-text-color)' }}>
+          <p style={{ color: '#ffffff' }}>
             <span className="font-bold">Бонусные баллы:</span> {user.bonus_points || 0}
           </p>
-          <p style={{ color: 'var(--tg-theme-text-color)' }}>
+          <p style={{ color: '#ffffff' }}>
             <span className="font-bold">Роль:</span> {user.role || 'Пользователь'}
           </p>
           {user.photo_url && (
@@ -118,8 +193,8 @@ function ProfilePage() {
       </div>
 
       {/* Создание пользователей */}
-      <div className="mb-6 p-3 bg-white rounded-lg shadow-md">
-        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+      <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Создать нового пользователя
         </h3>
         <div className="space-y-2">
@@ -128,50 +203,50 @@ function ProfilePage() {
             name="id"
             placeholder="ID пользователя"
             value={newUser.id}
-            onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            onChange={handleUserInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
           />
           <input
             type="text"
             name="name"
             placeholder="Имя"
             value={newUser.name}
-            onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            onChange={handleUserInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
           />
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={newUser.email}
-            onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            onChange={handleUserInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
           />
           <input
             type="number"
             name="bonus_points"
             placeholder="Бонусные баллы"
             value={newUser.bonus_points}
-            onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            onChange={handleUserInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
           />
           <input
             type="text"
             name="photo_url"
             placeholder="URL фото (опционально)"
             value={newUser.photo_url}
-            onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            onChange={handleUserInputChange}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
           />
           <button
             onClick={handleCreateUser}
             className="w-full px-4 py-2 rounded-lg shadow-md"
-            style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
+            style={{ backgroundColor: '#007bff', color: '#ffffff' }}
           >
             Создать пользователя
           </button>
@@ -180,17 +255,19 @@ function ProfilePage() {
 
       {/* Список пользователей */}
       <div className="mb-6">
-        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Список пользователей
         </h3>
         {loading ? (
-          <p className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>
+          <p className="text-center" style={{ color: '#ffffff' }}>
             Загрузка пользователей...
           </p>
         ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
+          <p className="text-center" style={{ color: '#ff0000' }}>
+            {error}
+          </p>
         ) : users.length === 0 ? (
-          <p className="text-center" style={{ color: 'var(--tg-theme-hint-color)' }}>
+          <p className="text-center" style={{ color: '#aaaaaa' }}>
             Пользователей нет
           </p>
         ) : (
@@ -198,19 +275,20 @@ function ProfilePage() {
             {users.map((u) => (
               <div
                 key={u.id}
-                className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
+                className="p-3 rounded-lg shadow-md flex justify-between items-center"
+                style={{ backgroundColor: '#1a1a1a' }}
               >
                 <div className="space-y-1">
-                  <p className="font-bold" style={{ color: 'var(--tg-theme-text-color)' }}>
+                  <p className="font-bold" style={{ color: '#ffffff' }}>
                     ID: {u.id}
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color)' }}>
+                  <p className="text-sm" style={{ color: '#aaaaaa' }}>
                     Имя: {u.name}
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color)' }}>
+                  <p className="text-sm" style={{ color: '#aaaaaa' }}>
                     Email: {u.email}
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color)' }}>
+                  <p className="text-sm" style={{ color: '#aaaaaa' }}>
                     Бонусные баллы: {u.bonus_points}
                   </p>
                   {u.photo_url && (
@@ -227,8 +305,8 @@ function ProfilePage() {
                   disabled={isDeleting[u.id]}
                   className="p-2 rounded-md disabled:opacity-50"
                   style={{
-                    backgroundColor: isDeleting[u.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
-                    color: 'var(--tg-theme-button-text-color)',
+                    backgroundColor: isDeleting[u.id] ? '#aaaaaa' : '#dc3545',
+                    color: '#ffffff',
                   }}
                 >
                   <FaTrash size={16} />
@@ -239,12 +317,113 @@ function ProfilePage() {
         )}
       </div>
 
-      {/* Админка ресторанов */}
+      {/* Управление ресторанами */}
       <div className="mb-6">
-        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color)' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Управление ресторанами
         </h3>
-        <RestaurantsAdminPage />
+        <div className="mb-4 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
+          <h4 className="text-md font-bold mb-2" style={{ color: '#ffffff' }}>
+            Добавить новый ресторан
+          </h4>
+          <input
+            type="text"
+            placeholder="Адрес ресторана"
+            value={newRestaurant}
+            onChange={(e) => setNewRestaurant(e.target.value)}
+            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
+          />
+          <button
+            onClick={handleAddRestaurant}
+            disabled={isAdding || !newRestaurant}
+            className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+            style={{
+              backgroundColor: isAdding ? '#aaaaaa' : '#007bff',
+              color: '#ffffff',
+            }}
+          >
+            {isAdding ? 'Добавление...' : 'Добавить ресторан'}
+          </button>
+        </div>
+        <h4 className="text-md font-bold mb-2" style={{ color: '#ffffff' }}>
+          Список ресторанов
+        </h4>
+        {loading ? (
+          <p className="text-center" style={{ color: '#ffffff' }}>
+            Загрузка ресторанов...
+          </p>
+        ) : error ? (
+          <p className="text-center" style={{ color: '#ff0000' }}>
+            {error}
+          </p>
+        ) : restaurants.length === 0 ? (
+          <p className="text-center" style={{ color: '#aaaaaa' }}>
+            Ресторанов нет
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {restaurants.map((restaurant) => (
+              <div
+                key={restaurant.id}
+                className="p-3 rounded-lg shadow-md"
+                style={{ backgroundColor: '#1a1a1a' }}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold" style={{ color: '#ffffff' }}>
+                    ID: {restaurant.id}, Адрес: {restaurant.address}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteRestaurant(restaurant.id)}
+                    disabled={isDeleting[restaurant.id]}
+                    className="p-2 rounded-md disabled:opacity-50"
+                    style={{
+                      backgroundColor: isDeleting[restaurant.id] ? '#aaaaaa' : '#dc3545',
+                      color: '#ffffff',
+                    }}
+                  >
+                    <FaTrash size={16} />
+                  </button>
+                </div>
+                <div className="mt-2">
+                  <h5 className="text-sm font-medium" style={{ color: '#ffffff' }}>
+                    Меню ресторана
+                  </h5>
+                  {menuItems[restaurant.id]?.length === 0 ? (
+                    <p className="text-sm" style={{ color: '#aaaaaa' }}>
+                      Меню пусто
+                    </p>
+                  ) : (
+                    <div className="space-y-2 mt-2">
+                      {menuItems[restaurant.id]?.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex justify-between items-center p-2 rounded-md"
+                          style={{ backgroundColor: '#2a2a2a' }}
+                        >
+                          <span className="text-sm" style={{ color: '#aaaaaa' }}>
+                            ID: {item.id}, {item.name}, Цена: {item.price}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteMenuItem(restaurant.id, item.id)}
+                            disabled={isDeletingMenuItem[item.id]}
+                            className="p-2 rounded-md disabled:opacity-50"
+                            style={{
+                              backgroundColor: isDeletingMenuItem[item.id] ? '#aaaaaa' : '#dc3545',
+                              color: '#ffffff',
+                            }}
+                          >
+                            <FaTrash size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
