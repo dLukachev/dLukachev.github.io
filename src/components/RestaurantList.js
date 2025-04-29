@@ -10,7 +10,10 @@ function RestaurantList() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !user.id) {
+            setLoading(false);
+            return; // Если user или user.id отсутствует, не делаем запрос
+        }
 
         const fetchRestaurants = async () => {
             try {
@@ -36,7 +39,7 @@ function RestaurantList() {
         return <p>Ошибка авторизации: {authError}</p>;
     }
 
-    if (!user) {
+    if (!user || !user.id) {
         return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
     }
 
