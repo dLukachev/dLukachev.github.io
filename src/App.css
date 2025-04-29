@@ -1,20 +1,9 @@
 /* App.css */
 
-/* Основные стили для тёмной темы */
-:root {
-  --tg-theme-bg-color: #1e1e1e;
-  --tg-theme-text-color: #ffffff;
-  --tg-theme-hint-color: #b0b0b0;
-  --tg-theme-link-color: #1976d2;
-  --tg-theme-button-color: #1976d2;
-  --tg-theme-button-text-color: #ffffff;
-  --tg-theme-secondary-bg-color: #2a2a2a;
-}
-
 /* Фон приложения */
 body {
-  background-color: var(--tg-theme-bg-color, #1e1e1e);
-  color: var(--tg-theme-text-color, #ffffff);
+  background-color: #1e1e1e;
+  color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
@@ -25,13 +14,13 @@ body {
 
 /* Подсказочный текст (серый) */
 .text-hint {
-  color: var(--tg-theme-hint-color, #b0b0b0);
+  color: #b0b0b0;
 }
 
 /* Стили для кнопок */
 button {
-  background-color: var(--tg-theme-button-color, #1976d2);
-  color: var(--tg-theme-button-text-color, #ffffff);
+  background-color: #1976d2; /* Синий */
+  color: #ffffff;
   border: none;
   transition: background-color 0.3s ease;
 }
@@ -56,14 +45,14 @@ button.bg-destructive:hover {
 
 /* Стили для кнопки редактирования */
 button.bg-secondary {
-  background-color: var(--tg-theme-secondary-bg-color, #2a2a2a);
+  background-color: #2a2a2a;
 }
 
 /* Стили для полей ввода */
 input,
 select {
-  background-color: var(--tg-theme-secondary-bg-color, #2a2a2a);
-  color: var(--tg-theme-text-color, #ffffff);
+  background-color: #2a2a2a;
+  color: #ffffff;
   border: 1px solid #444;
   padding: 8px;
   border-radius: 6px;
@@ -73,13 +62,13 @@ select {
 
 input::placeholder,
 select::placeholder {
-  color: var(--tg-theme-hint-color, #b0b0b0);
+  color: #b0b0b0;
 }
 
 input:focus,
 select:focus {
   outline: none;
-  border-color: var(--tg-theme-link-color, #1976d2);
+  border-color: #1976d2;
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3);
 }
 
@@ -89,7 +78,7 @@ select:focus {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--tg-theme-secondary-bg-color, #1e1e1e);
+  background-color: #1e1e1e;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: space-around;
@@ -100,12 +89,12 @@ select:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--tg-theme-hint-color, #b0b0b0);
+  color: #b0b0b0;
   text-decoration: none;
 }
 
 .nav-item.active {
-  color: var(--tg-theme-link-color, #1976d2);
+  color: #1976d2;
 }
 
 .nav-item span {
@@ -114,12 +103,12 @@ select:focus {
 
 /* Стили для карточек */
 .bg-white {
-  background-color: #2a2a2a; /* Заменяем белый фон на тёмный */
+  background-color: #2a2a2a; /* Тёмный фон для карточек */
 }
 
 /* Стили для заголовков */
 h2, h3, h4, h5 {
-  color: var(--tg-theme-text-color, #ffffff);
+  color: #ffffff;
 }
 
 /* Стили для списков */

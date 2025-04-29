@@ -15,68 +15,63 @@ function ProfilePage() {
   const [users, setUsers] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [menuItems, setMenuItems] = useState({});
+  const [tables, setTables] = useState({}); // Новое состояние для столов
   const [newRestaurant, setNewRestaurant] = useState('');
+  const [newTable, setNewTable] = useState({}); // Состояние для создания столов
+  const [newMenuItem, setNewMenuItem] = useState({}); // Состояние для создания пунктов меню
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [isAddingTable, setIsAddingTable] = useState({}); // Состояние загрузки для столов
+  const [isAddingMenuItem, setIsAddingMenuItem] = useState({}); // Состояние загрузки для меню
   const [isDeleting, setIsDeleting] = useState({});
   const [isDeletingMenuItem, setIsDeletingMenuItem] = useState({});
-  const [authRetry, setAuthRetry] = useState(false);
 
   useEffect(() => {
-    console.log('User from AuthContext:', user);
-    if (!user) {
-      const timer = setTimeout(() => {
-        setAuthRetry(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
+    if (!user) return;
 
     const fetchData = async () => {
       try {
-        console.log('Fetching users...');
         const usersData = await api.getUsers();
-        console.log('Users data:', usersData);
         setUsers(usersData?.users || []);
 
-        console.log('Fetching restaurants with params:', { user_id: user.id, first_name: user.firstName });
         const restaurantsData = await api.getRestaurants({
           user_id: user.id,
           first_name: user.firstName,
         });
-        console.log('Raw restaurants data:', restaurantsData);
-
         const formattedRestaurants = restaurantsData.map(item => ({
           id: item.data.restaurants_id,
           address: item.data.restaurants_address,
         }));
-        console.log('Formatted restaurants:', formattedRestaurants);
         setRestaurants(formattedRestaurants);
 
         const menuData = {};
+        const tablesData = {};
         for (const restaurant of formattedRestaurants) {
-          console.log(`Fetching menu for restaurant ${restaurant.id}...`);
           try {
             const menuResponse = await api.getMenu(restaurant.id);
-            console.log(`Menu for restaurant ${restaurant.id}:`, menuResponse);
             menuData[restaurant.id] = menuResponse || [];
           } catch (error) {
-            console.error(`Ошибка загрузки меню для ресторана ${restaurant.id}:`, error);
             menuData[restaurant.id] = [];
           }
+          try {
+            const tablesResponse = await api.getAvailableTables(restaurant.id);
+            tablesData[restaurant.id] = tablesResponse || [];
+          } catch (error) {
+            tablesData[restaurant.id] = [];
+          }
         }
-        console.log('Menu data:', menuData);
         setMenuItems(menuData);
+        setTables(tablesData);
 
         setLoading(false);
       } catch (error) {
-        console.error('Fetch data error:', error);
         setError('Не удалось загрузить данные: ' + error.message);
         setLoading(false);
       }
     };
     fetchData();
-  }, [user, authRetry]);
+  }, [user]);
 
   const handleUserInputChange = (e) => {
     const { name, value } = e.target;
@@ -91,14 +86,11 @@ function ProfilePage() {
         id: parseInt(newUser.id),
         bonus_points: parseFloat(newUser.bonus_points) || 0,
       };
-      console.log('Creating user with data:', userData);
       const response = await api.createUser(userData);
-      console.log('Create user response:', response);
       setUsers((prev) => [...prev, response.user]);
       setNewUser({ id: '', name: '', email: '', bonus_points: 0, photo_url: '' });
       alert('Пользователь создан');
     } catch (error) {
-      console.error('Create user error:', error);
       alert('Не удалось создать пользователя: ' + error.message);
     } finally {
       setIsAdding(false);
@@ -108,12 +100,10 @@ function ProfilePage() {
   const handleDeleteUser = async (userId) => {
     setIsDeleting((prev) => ({ ...prev, [userId]: true }));
     try {
-      console.log('Deleting user:', userId);
       await api.deleteUser(userId);
       setUsers((prev) => prev.filter((user) => user.id !== userId));
       alert('Пользователь удалён');
     } catch (error) {
-      console.error('Delete user error:', error);
       alert('Не удалось удалить пользователя: ' + error.message);
     } finally {
       setIsDeleting((prev) => ({ ...prev, [userId]: false }));
@@ -123,15 +113,13 @@ function ProfilePage() {
   const handleAddRestaurant = async () => {
     setIsAdding(true);
     try {
-      console.log('Adding restaurant with address:', newRestaurant);
       const response = await api.addRestaurant({ address: newRestaurant });
-      console.log('Add restaurant response:', response);
       setRestaurants((prev) => [...prev, response.restaurant]);
       setMenuItems((prev) => ({ ...prev, [response.restaurant.id]: [] }));
+      setTables((prev) => ({ ...prev, [response.restaurant.id]: [] }));
       setNewRestaurant('');
       alert('Ресторан добавлен');
     } catch (error) {
-      console.error('Add restaurant error:', error);
       if (error.message.includes('already exists')) {
         alert('Ресторан с таким адресом уже существует. Попробуйте другой адрес.');
       } else {
@@ -145,7 +133,6 @@ function ProfilePage() {
   const handleDeleteRestaurant = async (restaurantId) => {
     setIsDeleting((prev) => ({ ...prev, [restaurantId]: true }));
     try {
-      console.log('Deleting restaurant:', restaurantId);
       await api.deleteRestaurant(restaurantId);
       setRestaurants((prev) => prev.filter((restaurant) => restaurant.id !== restaurantId));
       setMenuItems((prev) => {
@@ -153,9 +140,13 @@ function ProfilePage() {
         delete newMenuItems[restaurantId];
         return newMenuItems;
       });
+      setTables((prev) => {
+        const newTables = { ...prev };
+        delete newTables[restaurantId];
+        return newTables;
+      });
       alert('Ресторан удалён');
     } catch (error) {
-      console.error('Delete restaurant error:', error);
       alert('Не удалось удалить ресторан: ' + error.message);
     } finally {
       setIsDeleting((prev) => ({ ...prev, [restaurantId]: false }));
@@ -165,7 +156,6 @@ function ProfilePage() {
   const handleDeleteMenuItem = async (restaurantId, menuItemId) => {
     setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: true }));
     try {
-      console.log('Deleting menu item:', { restaurantId, menuItemId });
       await api.deleteMenuItem(restaurantId, menuItemId);
       setMenuItems((prev) => ({
         ...prev,
@@ -173,14 +163,85 @@ function ProfilePage() {
       }));
       alert('Элемент меню удалён');
     } catch (error) {
-      console.error('Delete menu item error:', error);
       alert('Не удалось удалить элемент меню: ' + error.message);
     } finally {
       setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: false }));
     }
   };
 
-  console.log('Rendering ProfilePage with state:', { authLoading, authError, user, loading, error, users, restaurants, menuItems });
+  // Обработчики для создания столов
+  const handleTableInputChange = (restaurantId, e) => {
+    const { name, value } = e.target;
+    setNewTable((prev) => ({
+      ...prev,
+      [restaurantId]: {
+        ...prev[restaurantId],
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleCreateTable = async (restaurantId) => {
+    setIsAddingTable((prev) => ({ ...prev, [restaurantId]: true }));
+    try {
+      const tableData = {
+        table_number: parseInt(newTable[restaurantId]?.table_number),
+        capacity: parseInt(newTable[restaurantId]?.capacity),
+      };
+      const response = await api.addTable(restaurantId, tableData);
+      setTables((prev) => ({
+        ...prev,
+        [restaurantId]: [...(prev[restaurantId] || []), response.table],
+      }));
+      setNewTable((prev) => ({
+        ...prev,
+        [restaurantId]: { table_number: '', capacity: '' },
+      }));
+      alert('Стол добавлен');
+    } catch (error) {
+      alert('Не удалось добавить стол: ' + error.message);
+    } finally {
+      setIsAddingTable((prev) => ({ ...prev, [restaurantId]: false }));
+    }
+  };
+
+  // Обработчики для создания пунктов меню
+  const handleMenuItemInputChange = (restaurantId, e) => {
+    const { name, value } = e.target;
+    setNewMenuItem((prev) => ({
+      ...prev,
+      [restaurantId]: {
+        ...prev[restaurantId],
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleCreateMenuItem = async (restaurantId) => {
+    setIsAddingMenuItem((prev) => ({ ...prev, [restaurantId]: true }));
+    try {
+      const menuItemData = {
+        name: newMenuItem[restaurantId]?.name,
+        price: parseFloat(newMenuItem[restaurantId]?.price),
+        description: newMenuItem[restaurantId]?.description || '',
+        image_url: newMenuItem[restaurantId]?.image_url || '',
+      };
+      const response = await api.addMenuItem(restaurantId, menuItemData);
+      setMenuItems((prev) => ({
+        ...prev,
+        [restaurantId]: [...(prev[restaurantId] || []), response.menu_item],
+      }));
+      setNewMenuItem((prev) => ({
+        ...prev,
+        [restaurantId]: { name: '', price: '', description: '', image_url: '' },
+      }));
+      alert('Пункт меню добавлен');
+    } catch (error) {
+      alert('Не удалось добавить пункт меню: ' + error.message);
+    } finally {
+      setIsAddingMenuItem((prev) => ({ ...prev, [restaurantId]: false }));
+    }
+  };
 
   if (authLoading) {
     return <p className="text-center">Авторизация...</p>;
@@ -194,7 +255,6 @@ function ProfilePage() {
     return (
       <div className="text-center">
         <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>
-        {authRetry && <p>Попытка повторной авторизации...</p>}
       </div>
     );
   }
@@ -214,9 +274,6 @@ function ProfilePage() {
           </p>
           <p>
             <span className="font-bold">Бонусные баллы:</span> {user.bonus_points || 0}
-          </p>
-          <p>
-            <span className="font-bold">Роль:</span> {user.role || 'Пользователь'}
           </p>
           {user.photo_url && (
             <img
@@ -238,7 +295,7 @@ function ProfilePage() {
             placeholder="ID пользователя"
             value={newUser.id}
             onChange={handleUserInputChange}
-            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
@@ -246,7 +303,7 @@ function ProfilePage() {
             placeholder="Имя"
             value={newUser.name}
             onChange={handleUserInputChange}
-            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="email"
@@ -254,7 +311,7 @@ function ProfilePage() {
             placeholder="Email"
             value={newUser.email}
             onChange={handleUserInputChange}
-            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="number"
@@ -262,7 +319,7 @@ function ProfilePage() {
             placeholder="Бонусные баллы"
             value={newUser.bonus_points}
             onChange={handleUserInputChange}
-            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
@@ -270,14 +327,14 @@ function ProfilePage() {
             placeholder="URL фото (опционально)"
             value={newUser.photo_url}
             onChange={handleUserInputChange}
-            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={handleCreateUser}
             disabled={isAdding}
             className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
           >
-            Создать пользователя
+            {isAdding ? 'Создание...' : 'Создать пользователя'}
           </button>
         </div>
       </div>
@@ -333,7 +390,7 @@ function ProfilePage() {
             placeholder="Адрес ресторана"
             value={newRestaurant}
             onChange={(e) => setNewRestaurant(e.target.value)}
-            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)] mb-2"
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
           />
           <button
             onClick={handleAddRestaurant}
@@ -369,12 +426,119 @@ function ProfilePage() {
                     <FaTrash size={16} />
                   </button>
                 </div>
-                <div className="mt-2">
-                  <h5 className="text-sm font-medium">Меню ресторана</h5>
+
+                {/* Раздел для создания столов */}
+                <div className="mt-4 p-3 rounded-lg shadow-md bg-white">
+                  <h5 className="text-md font-bold mb-2">Добавить новый стол</h5>
+                  <div className="space-y-2">
+                    <input
+                      type="number"
+                      name="table_number"
+                      placeholder="Номер стола"
+                      value={newTable[restaurant.id]?.table_number || ''}
+                      onChange={(e) => handleTableInputChange(restaurant.id, e)}
+                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="number"
+                      name="capacity"
+                      placeholder="Вместимость"
+                      value={newTable[restaurant.id]?.capacity || ''}
+                      onChange={(e) => handleTableInputChange(restaurant.id, e)}
+                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={() => handleCreateTable(restaurant.id)}
+                      disabled={
+                        isAddingTable[restaurant.id] ||
+                        !newTable[restaurant.id]?.table_number ||
+                        !newTable[restaurant.id]?.capacity
+                      }
+                      className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                    >
+                      {isAddingTable[restaurant.id] ? 'Добавление...' : 'Добавить стол'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Список столов */}
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium mb-2">Список столов</h5>
+                  {tables[restaurant.id]?.length === 0 ? (
+                    <p className="text-sm text-hint">Столов нет</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {tables[restaurant.id]?.map((table) => (
+                        <div
+                          key={table.table_number}
+                          className="flex justify-between items-center p-2 rounded-md bg-gray-100"
+                        >
+                          <span className="text-sm text-hint">
+                            Стол #{table.table_number}, Вместимость: {table.capacity}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Раздел для создания пунктов меню */}
+                <div className="mt-4 p-3 rounded-lg shadow-md bg-white">
+                  <h5 className="text-md font-bold mb-2">Добавить новый пункт меню</h5>
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Название"
+                      value={newMenuItem[restaurant.id]?.name || ''}
+                      onChange={(e) => handleMenuItemInputChange(restaurant.id, e)}
+                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="number"
+                      name="price"
+                      placeholder="Цена"
+                      value={newMenuItem[restaurant.id]?.price || ''}
+                      onChange={(e) => handleMenuItemInputChange(restaurant.id, e)}
+                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      name="description"
+                      placeholder="Описание (опционально)"
+                      value={newMenuItem[restaurant.id]?.description || ''}
+                      onChange={(e) => handleMenuItemInputChange(restaurant.id, e)}
+                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      name="image_url"
+                      placeholder="URL изображения (опционально)"
+                      value={newMenuItem[restaurant.id]?.image_url || ''}
+                      onChange={(e) => handleMenuItemInputChange(restaurant.id, e)}
+                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={() => handleCreateMenuItem(restaurant.id)}
+                      disabled={
+                        isAddingMenuItem[restaurant.id] ||
+                        !newMenuItem[restaurant.id]?.name ||
+                        !newMenuItem[restaurant.id]?.price
+                      }
+                      className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                    >
+                      {isAddingMenuItem[restaurant.id] ? 'Добавление...' : 'Добавить пункт меню'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Список пунктов меню */}
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium mb-2">Меню ресторана</h5>
                   {menuItems[restaurant.id]?.length === 0 ? (
                     <p className="text-sm text-hint">Меню пусто</p>
                   ) : (
-                    <div className="space-y-2 mt-2">
+                    <div className="space-y-2">
                       {menuItems[restaurant.id]?.map((item) => (
                         <div
                           key={item.id}
