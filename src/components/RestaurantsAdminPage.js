@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 
 function RestaurantsAdminPage() {
-    const { user, loading: authLoading } = useContext(AuthContext);
+    const { user, loading: authLoading, authError } = useContext(AuthContext); // Добавляем authError
     const [restaurants, setRestaurants] = useState([]);
     const [newRestaurant, setNewRestaurant] = useState('');
     const [loading, setLoading] = useState(true);
@@ -13,11 +13,18 @@ function RestaurantsAdminPage() {
     const [isDeleting, setIsDeleting] = useState({});
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !user.id) {
+            setLoading(false);
+            return; // Если user или user.id отсутствует, не делаем запрос
+        }
 
         const fetchRestaurants = async () => {
             try {
-                const data = await api.getRestaurants();
+                // Передаем user_id и first_name как параметры
+                const data = await api.getRestaurants({
+                    user_id: user.id,
+                    first_name: user.firstName,
+                });
                 setRestaurants(data || []);
                 setLoading(false);
             } catch (error) {
@@ -65,7 +72,11 @@ function RestaurantsAdminPage() {
         return <p>Авторизация...</p>;
     }
 
-    if (!user) {
+    if (authError) {
+        return <p>Ошибка авторизации: {authError}</p>;
+    }
+
+    if (!user || !user.id) {
         return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
     }
 
@@ -74,7 +85,7 @@ function RestaurantsAdminPage() {
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <p>Ошибка загрузки ресторанов: {error}</p>;
     }
 
     return (
