@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
-import { FaTrash, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 
 function ProfilePage() {
   const { user, loading: authLoading, authError } = useContext(AuthContext);
@@ -15,21 +15,16 @@ function ProfilePage() {
   const [users, setUsers] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [menuItems, setMenuItems] = useState({});
-  const [tables, setTables] = useState({});
   const [newRestaurant, setNewRestaurant] = useState('');
-  const [newTable, setNewTable] = useState({});
-  const [newMenuItem, setNewMenuItem] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [isCreatingTable, setIsCreatingTable] = useState({});
-  const [isCreatingMenuItem, setIsCreatingMenuItem] = useState({});
   const [isDeleting, setIsDeleting] = useState({});
   const [isDeletingMenuItem, setIsDeletingMenuItem] = useState({});
-  const [isDeletingTable, setIsDeletingTable] = useState({});
   const [authRetry, setAuthRetry] = useState(false);
 
   useEffect(() => {
+    console.log('User from AuthContext:', user);
     if (!user) {
       const timer = setTimeout(() => {
         setAuthRetry(true);
@@ -39,40 +34,43 @@ function ProfilePage() {
 
     const fetchData = async () => {
       try {
+        console.log('Fetching users...');
         const usersData = await api.getUsers();
+        console.log('Users data:', usersData);
         setUsers(usersData?.users || []);
 
+        console.log('Fetching restaurants with params:', { user_id: user.id, first_name: user.firstName });
         const restaurantsData = await api.getRestaurants({
           user_id: user.id,
           first_name: user.firstName,
         });
+        console.log('Raw restaurants data:', restaurantsData);
+
         const formattedRestaurants = restaurantsData.map(item => ({
           id: item.data.restaurants_id,
           address: item.data.restaurants_address,
         }));
+        console.log('Formatted restaurants:', formattedRestaurants);
         setRestaurants(formattedRestaurants);
 
         const menuData = {};
-        const tablesData = {};
         for (const restaurant of formattedRestaurants) {
+          console.log(`Fetching menu for restaurant ${restaurant.id}...`);
           try {
             const menuResponse = await api.getMenu(restaurant.id);
+            console.log(`Menu for restaurant ${restaurant.id}:`, menuResponse);
             menuData[restaurant.id] = menuResponse || [];
           } catch (error) {
+            console.error(`Ошибка загрузки меню для ресторана ${restaurant.id}:`, error);
             menuData[restaurant.id] = [];
           }
-          try {
-            const tablesResponse = await api.getAvailableTables(restaurant.id);
-            tablesData[restaurant.id] = tablesResponse || [];
-          } catch (error) {
-            tablesData[restaurant.id] = [];
-          }
         }
+        console.log('Menu data:', menuData);
         setMenuItems(menuData);
-        setTables(tablesData);
 
         setLoading(false);
       } catch (error) {
+        console.error('Fetch data error:', error);
         setError('Не удалось загрузить данные: ' + error.message);
         setLoading(false);
       }
@@ -93,11 +91,14 @@ function ProfilePage() {
         id: parseInt(newUser.id),
         bonus_points: parseFloat(newUser.bonus_points) || 0,
       };
+      console.log('Creating user with data:', userData);
       const response = await api.createUser(userData);
+      console.log('Create user response:', response);
       setUsers((prev) => [...prev, response.user]);
       setNewUser({ id: '', name: '', email: '', bonus_points: 0, photo_url: '' });
       alert('Пользователь создан');
     } catch (error) {
+      console.error('Create user error:', error);
       alert('Не удалось создать пользователя: ' + error.message);
     } finally {
       setIsAdding(false);
@@ -107,10 +108,12 @@ function ProfilePage() {
   const handleDeleteUser = async (userId) => {
     setIsDeleting((prev) => ({ ...prev, [userId]: true }));
     try {
+      console.log('Deleting user:', userId);
       await api.deleteUser(userId);
       setUsers((prev) => prev.filter((user) => user.id !== userId));
       alert('Пользователь удалён');
     } catch (error) {
+      console.error('Delete user error:', error);
       alert('Не удалось удалить пользователя: ' + error.message);
     } finally {
       setIsDeleting((prev) => ({ ...prev, [userId]: false }));
@@ -120,13 +123,15 @@ function ProfilePage() {
   const handleAddRestaurant = async () => {
     setIsAdding(true);
     try {
+      console.log('Adding restaurant with address:', newRestaurant);
       const response = await api.addRestaurant({ address: newRestaurant });
+      console.log('Add restaurant response:', response);
       setRestaurants((prev) => [...prev, response.restaurant]);
       setMenuItems((prev) => ({ ...prev, [response.restaurant.id]: [] }));
-      setTables((prev) => ({ ...prev, [response.restaurant.id]: [] }));
       setNewRestaurant('');
       alert('Ресторан добавлен');
     } catch (error) {
+      console.error('Add restaurant error:', error);
       if (error.message.includes('already exists')) {
         alert('Ресторан с таким адресом уже существует. Попробуйте другой адрес.');
       } else {
@@ -140,6 +145,7 @@ function ProfilePage() {
   const handleDeleteRestaurant = async (restaurantId) => {
     setIsDeleting((prev) => ({ ...prev, [restaurantId]: true }));
     try {
+      console.log('Deleting restaurant:', restaurantId);
       await api.deleteRestaurant(restaurantId);
       setRestaurants((prev) => prev.filter((restaurant) => restaurant.id !== restaurantId));
       setMenuItems((prev) => {
@@ -147,110 +153,19 @@ function ProfilePage() {
         delete newMenuItems[restaurantId];
         return newMenuItems;
       });
-      setTables((prev) => {
-        const newTables = { ...prev };
-        delete newTables[restaurantId];
-        return newTables;
-      });
       alert('Ресторан удалён');
     } catch (error) {
+      console.error('Delete restaurant error:', error);
       alert('Не удалось удалить ресторан: ' + error.message);
     } finally {
       setIsDeleting((prev) => ({ ...prev, [restaurantId]: false }));
     }
   };
 
-  const handleNewTableChange = (restaurantId, e) => {
-    const { name, value } = e.target;
-    setNewTable((prev) => ({
-      ...prev,
-      [restaurantId]: {
-        ...prev[restaurantId],
-        [name]: value,
-      },
-    }));
-  };
-
-  const handleCreateTable = async (restaurantId) => {
-    setIsCreatingTable((prev) => ({ ...prev, [restaurantId]: true }));
-    try {
-      const tableData = {
-        table_number: parseInt(newTable[restaurantId]?.table_number),
-        capacity: parseInt(newTable[restaurantId]?.capacity),
-      };
-      const response = await api.addTable(restaurantId, tableData);
-      setTables((prev) => ({
-        ...prev,
-        [restaurantId]: [...(prev[restaurantId] || []), { table_number: response.table.table_number, capacity: response.table.capacity }],
-      }));
-      setNewTable((prev) => ({
-        ...prev,
-        [restaurantId]: { table_number: '', capacity: '' },
-      }));
-      alert('Стол добавлен');
-    } catch (error) {
-      alert('Не удалось добавить стол: ' + error.message);
-    } finally {
-      setIsCreatingTable((prev) => ({ ...prev, [restaurantId]: false }));
-    }
-  };
-
-  const handleDeleteTable = async (restaurantId, tableNumber) => {
-    setIsDeletingTable((prev) => ({ ...prev, [tableNumber]: true }));
-    try {
-      await api.deleteTable(restaurantId, tableNumber);
-      setTables((prev) => ({
-        ...prev,
-        [restaurantId]: prev[restaurantId].filter((table) => table.table_number !== tableNumber),
-      }));
-      alert('Стол удалён');
-    } catch (error) {
-      alert('Не удалось удалить стол: ' + error.message);
-    } finally {
-      setIsDeletingTable((prev) => ({ ...prev, [tableNumber]: false }));
-    }
-  };
-
-  const handleNewMenuItemChange = (restaurantId, e) => {
-    const { name, value } = e.target;
-    setNewMenuItem((prev) => ({
-      ...prev,
-      [restaurantId]: {
-        ...prev[restaurantId],
-        [name]: value,
-      },
-    }));
-  };
-
-  const handleCreateMenuItem = async (restaurantId) => {
-    setIsCreatingMenuItem((prev) => ({ ...prev, [restaurantId]: true }));
-    try {
-      const newItemData = {
-        name: newMenuItem[restaurantId]?.name,
-        price: parseFloat(newMenuItem[restaurantId]?.price),
-        description: newMenuItem[restaurantId]?.description,
-        image_url: newMenuItem[restaurantId]?.image_url,
-      };
-      const response = await api.addMenuItem(restaurantId, newItemData);
-      setMenuItems((prev) => ({
-        ...prev,
-        [restaurantId]: [...(prev[restaurantId] || []), response.menu_item],
-      }));
-      setNewMenuItem((prev) => ({
-        ...prev,
-        [restaurantId]: { name: '', price: '', description: '', image_url: '' },
-      }));
-      alert('Пункт меню добавлен');
-    } catch (error) {
-      alert('Не удалось добавить пункт меню: ' + error.message);
-    } finally {
-      setIsCreatingMenuItem((prev) => ({ ...prev, [restaurantId]: false }));
-    }
-  };
-
   const handleDeleteMenuItem = async (restaurantId, menuItemId) => {
     setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: true }));
     try {
+      console.log('Deleting menu item:', { restaurantId, menuItemId });
       await api.deleteMenuItem(restaurantId, menuItemId);
       setMenuItems((prev) => ({
         ...prev,
@@ -258,11 +173,14 @@ function ProfilePage() {
       }));
       alert('Элемент меню удалён');
     } catch (error) {
+      console.error('Delete menu item error:', error);
       alert('Не удалось удалить элемент меню: ' + error.message);
     } finally {
       setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: false }));
     }
   };
+
+  console.log('Rendering ProfilePage with state:', { authLoading, authError, user, loading, error, users, restaurants, menuItems });
 
   if (authLoading) {
     return <p className="text-center">Авторизация...</p>;
@@ -311,295 +229,177 @@ function ProfilePage() {
         </div>
       </div>
 
-      {user.role === 'admin' && (
-        <>
-          <div className="mb-6 p-3 rounded-lg shadow-md bg-white">
-            <h3 className="text-lg font-bold mb-2">Создать нового пользователя</h3>
-            <div className="space-y-2">
-              <input
-                type="text"
-                name="id"
-                placeholder="ID пользователя"
-                value={newUser.id}
-                onChange={handleUserInputChange}
-                className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              />
-              <input
-                type="text"
-                name="name"
-                placeholder="Имя"
-                value={newUser.name}
-                onChange={handleUserInputChange}
-                className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={newUser.email}
-                onChange={handleUserInputChange}
-                className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              />
-              <input
-                type="number"
-                name="bonus_points"
-                placeholder="Бонусные баллы"
-                value={newUser.bonus_points}
-                onChange={handleUserInputChange}
-                className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              />
-              <input
-                type="text"
-                name="photo_url"
-                placeholder="URL фото (опционально)"
-                value={newUser.photo_url}
-                onChange={handleUserInputChange}
-                className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              />
-              <button
-                onClick={handleCreateUser}
-                disabled={isAdding}
-                className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+      <div className="mb-6 p-3 rounded-lg shadow-md bg-white">
+        <h3 className="text-lg font-bold mb-2">Создать нового пользователя</h3>
+        <div className="space-y-2">
+          <input
+            type="text"
+            name="id"
+            placeholder="ID пользователя"
+            value={newUser.id}
+            onChange={handleUserInputChange}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+          />
+          <input
+            type="text"
+            name="name"
+            placeholder="Имя"
+            value={newUser.name}
+            onChange={handleUserInputChange}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={newUser.email}
+            onChange={handleUserInputChange}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+          />
+          <input
+            type="number"
+            name="bonus_points"
+            placeholder="Бонусные баллы"
+            value={newUser.bonus_points}
+            onChange={handleUserInputChange}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+          />
+          <input
+            type="text"
+            name="photo_url"
+            placeholder="URL фото (опционально)"
+            value={newUser.photo_url}
+            onChange={handleUserInputChange}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+          />
+          <button
+            onClick={handleCreateUser}
+            disabled={isAdding}
+            className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+          >
+            Создать пользователя
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-2">Список пользователей</h3>
+        {loading ? (
+          <p className="text-center">Загрузка пользователей...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : users.length === 0 ? (
+          <p className="text-center text-hint">Пользователей нет</p>
+        ) : (
+          <div className="space-y-4">
+            {users.map((u) => (
+              <div
+                key={u.id}
+                className="p-3 rounded-lg shadow-md flex justify-between items-center bg-white"
               >
-                {isAdding ? 'Создание...' : 'Создать пользователя'}
-              </button>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-lg font-bold mb-2">Список пользователей</h3>
-            {loading ? (
-              <p className="text-center">Загрузка пользователей...</p>
-            ) : error ? (
-              <p className="text-center text-red-500">{error}</p>
-            ) : users.length === 0 ? (
-              <p className="text-center text-hint">Пользователей нет</p>
-            ) : (
-              <div className="space-y-4">
-                {users.map((u) => (
-                  <div
-                    key={u.id}
-                    className="p-3 rounded-lg shadow-md flex justify-between items-center bg-white"
-                  >
-                    <div className="space-y-1">
-                      <p className="font-bold">ID: {u.id}</p>
-                      <p className="text-sm text-hint">Имя: {u.name}</p>
-                      <p className="text-sm text-hint">Email: {u.email}</p>
-                      <p className="text-sm text-hint">Бонусные баллы: {u.bonus_points}</p>
-                      {u.photo_url && (
-                        <img
-                          src={u.photo_url}
-                          alt={u.name}
-                          className="w-12 h-12 object-cover rounded-md"
-                          onError={(e) => (e.target.src = 'https://placehold.co/50x50')}
-                        />
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleDeleteUser(u.id)}
-                      disabled={isDeleting[u.id]}
-                      className="p-2 rounded-md disabled:opacity-50 bg-destructive"
-                    >
-                      <FaTrash size={16} />
-                    </button>
-                  </div>
-                ))}
+                <div className="space-y-1">
+                  <p className="font-bold">ID: {u.id}</p>
+                  <p className="text-sm text-hint">Имя: {u.name}</p>
+                  <p className="text-sm text-hint">Email: {u.email}</p>
+                  <p className="text-sm text-hint">Бонусные баллы: {u.bonus_points}</p>
+                  {u.photo_url && (
+                    <img
+                      src={u.photo_url}
+                      alt={u.name}
+                      className="w-12 h-12 object-cover rounded-md"
+                      onError={(e) => (e.target.src = 'https://placehold.co/50x50')}
+                    />
+                  )}
+                </div>
+                <button
+                  onClick={() => handleDeleteUser(u.id)}
+                  disabled={isDeleting[u.id]}
+                  className="p-2 rounded-md disabled:opacity-50 bg-destructive"
+                >
+                  <FaTrash size={16} />
+                </button>
               </div>
-            )}
+            ))}
           </div>
+        )}
+      </div>
 
-          <div className="mb-6">
-            <h3 className="text-lg font-bold mb-2">Управление ресторанами</h3>
-            <div className="mb-4 p-3 rounded-lg shadow-md bg-white">
-              <h4 className="text-md font-bold mb-2">Добавить новый ресторан</h4>
-              <input
-                type="text"
-                placeholder="Адрес ресторана"
-                value={newRestaurant}
-                onChange={(e) => setNewRestaurant(e.target.value)}
-                className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)] mb-2"
-              />
-              <button
-                onClick={handleAddRestaurant}
-                disabled={isAdding || !newRestaurant}
-                className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-2">Управление ресторанами</h3>
+        <div className="mb-4 p-3 rounded-lg shadow-md bg-white">
+          <h4 className="text-md font-bold mb-2">Добавить новый ресторан</h4>
+          <input
+            type="text"
+            placeholder="Адрес ресторана"
+            value={newRestaurant}
+            onChange={(e) => setNewRestaurant(e.target.value)}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)] mb-2"
+          />
+          <button
+            onClick={handleAddRestaurant}
+            disabled={isAdding || !newRestaurant}
+            className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+          >
+            {isAdding ? 'Добавление...' : 'Добавить ресторан'}
+          </button>
+        </div>
+        <h4 className="text-md font-bold mb-2">Список ресторанов</h4>
+        {loading ? (
+          <p className="text-center">Загрузка ресторанов...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : restaurants.length === 0 ? (
+          <p className="text-center text-hint">Ресторанов нет</p>
+        ) : (
+          <div className="space-y-4">
+            {restaurants.map((restaurant) => (
+              <div
+                key={restaurant.id}
+                className="p-3 rounded-lg shadow-md bg-white"
               >
-                {isAdding ? 'Добавление...' : 'Добавить ресторан'}
-              </button>
-            </div>
-            <h4 className="text-md font-bold mb-2">Список ресторанов</h4>
-            {loading ? (
-              <p className="text-center">Загрузка ресторанов...</p>
-            ) : error ? (
-              <p className="text-center text-red-500">{error}</p>
-            ) : restaurants.length === 0 ? (
-              <p className="text-center text-hint">Ресторанов нет</p>
-            ) : (
-              <div className="space-y-4">
-                {restaurants.map((restaurant) => (
-                  <div
-                    key={restaurant.id}
-                    className="p-3 rounded-lg shadow-md bg-white"
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold">
+                    ID: {restaurant.id}, Адрес: {restaurant.address}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteRestaurant(restaurant.id)}
+                    disabled={isDeleting[restaurant.id]}
+                    className="p-2 rounded-md disabled:opacity-50 bg-destructive"
                   >
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-bold">
-                        ID: {restaurant.id}, Адрес: {restaurant.address}
-                      </span>
-                      <button
-                        onClick={() => handleDeleteRestaurant(restaurant.id)}
-                        disabled={isDeleting[restaurant.id]}
-                        className="p-2 rounded-md disabled:opacity-50 bg-destructive"
-                      >
-                        <FaTrash size={16} />
-                      </button>
-                    </div>
-
-                    {/* Раздел добавления столиков */}
-                    <div className="mt-4">
-                      <h5 className="text-sm font-medium mb-2">Добавить новый стол</h5>
-                      <div className="space-y-2">
-                        <input
-                          type="number"
-                          name="table_number"
-                          placeholder="Номер стола"
-                          value={newTable[restaurant.id]?.table_number || ''}
-                          onChange={(e) => handleNewTableChange(restaurant.id, e)}
-                          className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        />
-                        <input
-                          type="number"
-                          name="capacity"
-                          placeholder="Вместимость стола"
-                          value={newTable[restaurant.id]?.capacity || ''}
-                          onChange={(e) => handleNewTableChange(restaurant.id, e)}
-                          className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        />
-                        <button
-                          onClick={() => handleCreateTable(restaurant.id)}
-                          disabled={
-                            isCreatingTable[restaurant.id] ||
-                            !newTable[restaurant.id]?.table_number ||
-                            !newTable[restaurant.id]?.capacity
-                          }
-                          className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+                    <FaTrash size={16} />
+                  </button>
+                </div>
+                <div className="mt-2">
+                  <h5 className="text-sm font-medium">Меню ресторана</h5>
+                  {menuItems[restaurant.id]?.length === 0 ? (
+                    <p className="text-sm text-hint">Меню пусто</p>
+                  ) : (
+                    <div className="space-y-2 mt-2">
+                      {menuItems[restaurant.id]?.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex justify-between items-center p-2 rounded-md bg-gray-100"
                         >
-                          {isCreatingTable[restaurant.id] ? 'Добавление...' : 'Добавить стол'}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Список столиков */}
-                    <div className="mt-4">
-                      <h5 className="text-sm font-medium mb-2">Список столов</h5>
-                      {tables[restaurant.id]?.length === 0 ? (
-                        <p className="text-sm text-hint">Столов нет</p>
-                      ) : (
-                        <div className="space-y-2">
-                          {tables[restaurant.id]?.map((table) => (
-                            <div
-                              key={table.table_number}
-                              className="flex justify-between items-center p-2 rounded-md bg-gray-100"
-                            >
-                              <span className="text-sm text-hint">
-                                Стол #{table.table_number}, Вместимость: {table.capacity}
-                              </span>
-                              <button
-                                onClick={() => handleDeleteTable(restaurant.id, table.table_number)}
-                                disabled={isDeletingTable[table.table_number]}
-                                className="p-2 rounded-md disabled:opacity-50 bg-destructive"
-                              >
-                                <FaTrash size={16} />
-                              </button>
-                            </div>
-                          ))}
+                          <span className="text-sm text-hint">
+                            ID: {item.id}, {item.name}, Цена: {item.price}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteMenuItem(restaurant.id, item.id)}
+                            disabled={isDeletingMenuItem[item.id]}
+                            className="p-2 rounded-md disabled:opacity-50 bg-destructive"
+                          >
+                            <FaTrash size={16} />
+                          </button>
                         </div>
-                      )}
+                      ))}
                     </div>
-
-                    {/* Раздел добавления пунктов меню */}
-                    <div className="mt-4">
-                      <h5 className="text-sm font-medium mb-2">Добавить новый пункт меню</h5>
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          name="name"
-                          placeholder="Название"
-                          value={newMenuItem[restaurant.id]?.name || ''}
-                          onChange={(e) => handleNewMenuItemChange(restaurant.id, e)}
-                          className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        />
-                        <input
-                          type="number"
-                          name="price"
-                          placeholder="Цена"
-                          value={newMenuItem[restaurant.id]?.price || ''}
-                          onChange={(e) => handleNewMenuItemChange(restaurant.id, e)}
-                          className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        />
-                        <input
-                          type="text"
-                          name="description"
-                          placeholder="Описание (опционально)"
-                          value={newMenuItem[restaurant.id]?.description || ''}
-                          onChange={(e) => handleNewMenuItemChange(restaurant.id, e)}
-                          className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        />
-                        <input
-                          type="text"
-                          name="image_url"
-                          placeholder="URL изображения (опционально)"
-                          value={newMenuItem[restaurant.id]?.image_url || ''}
-                          onChange={(e) => handleNewMenuItemChange(restaurant.id, e)}
-                          className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        />
-                        <button
-                          onClick={() => handleCreateMenuItem(restaurant.id)}
-                          disabled={
-                            isCreatingMenuItem[restaurant.id] ||
-                            !newMenuItem[restaurant.id]?.name ||
-                            !newMenuItem[restaurant.id]?.price
-                          }
-                          className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-                        >
-                          {isCreatingMenuItem[restaurant.id] ? 'Добавление...' : 'Добавить пункт меню'}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Список пунктов меню */}
-                    <div className="mt-4">
-                      <h5 className="text-sm font-medium mb-2">Меню ресторана</h5>
-                      {menuItems[restaurant.id]?.length === 0 ? (
-                        <p className="text-sm text-hint">Меню пусто</p>
-                      ) : (
-                        <div className="space-y-2">
-                          {menuItems[restaurant.id]?.map((item) => (
-                            <div
-                              key={item.id}
-                              className="flex justify-between items-center p-2 rounded-md bg-gray-100"
-                            >
-                              <span className="text-sm text-hint">
-                                ID: {item.id}, {item.name}, Цена: {item.price}
-                              </span>
-                              <button
-                                onClick={() => handleDeleteMenuItem(restaurant.id, item.id)}
-                                disabled={isDeletingMenuItem[item.id]}
-                                className="p-2 rounded-md disabled:opacity-50 bg-destructive"
-                              >
-                                <FaTrash size={16} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  )}
+                </div>
               </div>
-            )}
+            ))}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
