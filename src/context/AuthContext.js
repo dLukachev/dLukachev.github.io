@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState(null);
-    const [retryCount, setRetryCount] = useState(0); // Счетчик повторных попыток
+    const [retryCount, setRetryCount] = useState(0);
 
     const validateTelegram = async (initDataRaw) => {
         try {
@@ -24,15 +24,20 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             setAuthError(null);
 
-            // Проверяем доступность ресторанов
-            await api.getRestaurants({
-                user_id: userData.id,
-                first_name: userData.firstName,
-            });
-            console.log('Successfully fetched restaurants for user:', userData.id);
+            try {
+                console.log('Fetching restaurants for user:', userData.id);
+                const restaurants = await api.getRestaurants({
+                    user_id: userData.id,
+                    first_name: userData.firstName,
+                });
+                console.log('Restaurants fetched successfully:', restaurants);
+            } catch (error) {
+                console.error('Error fetching restaurants:', error.message);
+                setAuthError('Не удалось загрузить рестораны: ' + error.message);
+            }
         } catch (error) {
             console.error('Validation error:', error.message);
-            throw error; // Пробрасываем ошибку для обработки в основном блоке
+            throw error;
         }
     };
 
@@ -50,7 +55,6 @@ export const AuthProvider = ({ children }) => {
                     throw new Error('Не удалось получить initData от Telegram');
                 }
 
-                // Пытаемся валидировать initData
                 await validateTelegram(initDataRaw);
             } else {
                 console.log('Telegram Web App не доступен. Используется тестовый пользователь.');
@@ -75,35 +79,30 @@ export const AuthProvider = ({ children }) => {
                 } catch (error) {
                     console.error('Ошибка при авторизации тестового пользователя:', error.message);
                     setAuthError('Не удалось авторизовать тестового пользователя: ' + error.message);
-                    setUser(null); // Сбрасываем user, если запрос не удался
-                    throw error;
                 }
             }
         } catch (error) {
             console.error('Общая ошибка при инициализации Telegram:', error.message);
             setAuthError('Ошибка инициализации: ' + error.message);
 
-            // Пробуем повторить валидацию, если это не последняя попытка
             if (retryCount < 2) {
                 console.log(`Попытка повторной валидации (${retryCount + 1}/2)...`);
                 setTimeout(() => {
                     setRetryCount((prev) => prev + 1);
                     initTelegram();
-                }, 3000); // Ждем 3 секунды перед повторной попыткой
-                return; // Не устанавливаем loading в false, пока не закончим повторные попытки
-            } else {
-                setUser(null); // Если все попытки исчерпаны, сбрасываем user
+                }, 3000);
+                return;
             }
         } finally {
             if (retryCount >= 2 || !authError) {
-                setLoading(false); // Устанавливаем loading в false только после всех попыток
+                setLoading(false);
             }
         }
     };
 
     useEffect(() => {
         initTelegram();
-    }, [retryCount]); // Повторный вызов при изменении retryCount
+    }, [retryCount]);
 
     return (
         <AuthContext.Provider value={{ user, loading, authError }}>

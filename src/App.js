@@ -39,8 +39,18 @@ function AppContent() {
         <Route path="/restaurants-admin" element={<RestaurantsAdminPage />} />
         <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <BottomNav />
+    </div>
+  );
+}
+
+function NotFound() {
+  return (
+    <div className="text-center p-4" style={{ color: 'var(--tg-theme-text-color)', backgroundColor: 'var(--tg-theme-bg-color)', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+      <h1 className="text-2xl font-bold mb-2">Страница не найдена</h1>
+      <p>Проверьте URL или вернитесь на главную страницу.</p>
     </div>
   );
 }

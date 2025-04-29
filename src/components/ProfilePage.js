@@ -21,12 +21,11 @@ function ProfilePage() {
   const [isAdding, setIsAdding] = useState(false);
   const [isDeleting, setIsDeleting] = useState({});
   const [isDeletingMenuItem, setIsDeletingMenuItem] = useState({});
-  const [authRetry, setAuthRetry] = useState(false); // Новое состояние для отслеживания попыток авторизации
+  const [authRetry, setAuthRetry] = useState(false);
 
   useEffect(() => {
     console.log('User from AuthContext:', user);
     if (!user) {
-      // Если user отсутствует, попробуем подождать 3 секунды перед повторной попыткой
       const timer = setTimeout(() => {
         setAuthRetry(true);
       }, 3000);
@@ -38,23 +37,30 @@ function ProfilePage() {
         console.log('Fetching users...');
         const usersData = await api.getUsers();
         console.log('Users data:', usersData);
-        setUsers(usersData || []);
+        setUsers(usersData?.users || []);
 
         console.log('Fetching restaurants with params:', { user_id: user.id, first_name: user.firstName });
         const restaurantsData = await api.getRestaurants({
           user_id: user.id,
           first_name: user.firstName,
         });
-        console.log('Restaurants data:', restaurantsData);
-        setRestaurants(restaurantsData || []);
+        console.log('Raw restaurants data:', restaurantsData);
+
+        // Приводим данные к ожидаемому формату
+        const formattedRestaurants = restaurantsData.map(item => ({
+          id: item.data.restaurants_id,
+          address: item.data.restaurants_address,
+        }));
+        console.log('Formatted restaurants:', formattedRestaurants);
+        setRestaurants(formattedRestaurants);
 
         const menuData = {};
-        for (const restaurant of restaurantsData) {
+        for (const restaurant of formattedRestaurants) {
           console.log(`Fetching menu for restaurant ${restaurant.id}...`);
           try {
             const menuResponse = await api.getMenu(restaurant.id);
             console.log(`Menu for restaurant ${restaurant.id}:`, menuResponse);
-            menuData[restaurant.id] = menuResponse.menu || [];
+            menuData[restaurant.id] = menuResponse || [];
           } catch (error) {
             console.error(`Ошибка загрузки меню для ресторана ${restaurant.id}:`, error);
             menuData[restaurant.id] = [];
@@ -89,7 +95,7 @@ function ProfilePage() {
       console.log('Creating user with data:', userData);
       const response = await api.createUser(userData);
       console.log('Create user response:', response);
-      setUsers((prev) => [...prev, response]);
+      setUsers((prev) => [...prev, response.user]);
       setNewUser({ id: '', name: '', email: '', bonus_points: 0, photo_url: '' });
       alert('Пользователь создан');
     } catch (error) {
@@ -121,13 +127,17 @@ function ProfilePage() {
       console.log('Adding restaurant with address:', newRestaurant);
       const response = await api.addRestaurant({ address: newRestaurant });
       console.log('Add restaurant response:', response);
-      setRestaurants((prev) => [...prev, response]);
-      setMenuItems((prev) => ({ ...prev, [response.id]: [] }));
+      setRestaurants((prev) => [...prev, response.restaurant]);
+      setMenuItems((prev) => ({ ...prev, [response.restaurant.id]: [] }));
       setNewRestaurant('');
       alert('Ресторан добавлен');
     } catch (error) {
       console.error('Add restaurant error:', error);
-      alert('Не удалось добавить ресторан: ' + error.message);
+      if (error.message.includes('already exists')) {
+        alert('Ресторан с таким адресом уже существует. Попробуйте другой адрес.');
+      } else {
+        alert('Не удалось добавить ресторан: ' + error.message);
+      }
     } finally {
       setIsAdding(false);
     }
@@ -174,16 +184,16 @@ function ProfilePage() {
   console.log('Rendering ProfilePage with state:', { authLoading, authError, user, loading, error, users, restaurants, menuItems });
 
   if (authLoading) {
-    return <p className="text-center" style={{ color: '#ffffff' }}>Авторизация...</p>;
+    return <p className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>Авторизация...</p>;
   }
 
   if (authError) {
-    return <p className="text-center" style={{ color: '#ff0000' }}>Ошибка авторизации: {authError}</p>;
+    return <p className="text-center" style={{ color: 'var(--tg-theme-error-color, #ff0000)' }}>Ошибка авторизации: {authError}</p>;
   }
 
   if (!user || !user.id) {
     return (
-      <div className="text-center" style={{ color: '#ffffff' }}>
+      <div className="text-center" style={{ color: 'var(--tg-theme-text-color)' }}>
         <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>
         {authRetry && <p>Попытка повторной авторизации...</p>}
       </div>
@@ -191,24 +201,24 @@ function ProfilePage() {
   }
 
   return (
-    <div className="p-4" style={{ backgroundColor: '#000000' }}>
-      <h2 className="text-xl font-bold mb-4" style={{ color: '#ffffff' }}>Профиль</h2>
+    <div className="p-4" style={{ backgroundColor: 'var(--tg-theme-bg-color, #000000)' }}>
+      <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>Профиль</h2>
 
-      <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
-        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
-          Информация о пользователе
+      <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: 'var(--tg-theme-secondary-bg-color, #1a1a1a)' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
+          Информация о пользователя
         </h3>
         <div className="space-y-1">
-          <p style={{ color: '#ffffff' }}>
+          <p style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
             <span className="font-bold">Имя:</span> {user.firstName || 'Не указано'}
           </p>
-          <p style={{ color: '#ffffff' }}>
+          <p style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
             <span className="font-bold">Email:</span> {user.email || 'Не указано'}
           </p>
-          <p style={{ color: '#ffffff' }}>
+          <p style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
             <span className="font-bold">Бонусные баллы:</span> {user.bonus_points || 0}
           </p>
-          <p style={{ color: '#ffffff' }}>
+          <p style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
             <span className="font-bold">Роль:</span> {user.role || 'Пользователь'}
           </p>
           {user.photo_url && (
@@ -222,8 +232,8 @@ function ProfilePage() {
         </div>
       </div>
 
-      <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
-        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
+      <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: 'var(--tg-theme-secondary-bg-color, #1a1a1a)' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
           Создать нового пользователя
         </h3>
         <div className="space-y-2">
@@ -234,7 +244,7 @@ function ProfilePage() {
             value={newUser.id}
             onChange={handleUserInputChange}
             className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
+            style={{ borderColor: 'var(--tg-theme-hint-color, #aaaaaa)', backgroundColor: 'var(--tg-theme-secondary-bg-color, #2a2a2a)', color: 'var(--tg-theme-text-color, #ffffff)' }}
           />
           <input
             type="text"
@@ -243,7 +253,7 @@ function ProfilePage() {
             value={newUser.name}
             onChange={handleUserInputChange}
             className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
+            style={{ borderColor: 'var(--tg-theme-hint-color, #aaaaaa)', backgroundColor: 'var(--tg-theme-secondary-bg-color, #2a2a2a)', color: 'var(--tg-theme-text-color, #ffffff)' }}
           />
           <input
             type="email"
@@ -252,7 +262,7 @@ function ProfilePage() {
             value={newUser.email}
             onChange={handleUserInputChange}
             className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
+            style={{ borderColor: 'var(--tg-theme-hint-color, #aaaaaa)', backgroundColor: 'var(--tg-theme-secondary-bg-color, #2a2a2a)', color: 'var(--tg-theme-text-color, #ffffff)' }}
           />
           <input
             type="number"
@@ -261,7 +271,7 @@ function ProfilePage() {
             value={newUser.bonus_points}
             onChange={handleUserInputChange}
             className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
+            style={{ borderColor: 'var(--tg-theme-hint-color, #aaaaaa)', backgroundColor: 'var(--tg-theme-secondary-bg-color, #2a2a2a)', color: 'var(--tg-theme-text-color, #ffffff)' }}
           />
           <input
             type="text"
@@ -270,13 +280,13 @@ function ProfilePage() {
             value={newUser.photo_url}
             onChange={handleUserInputChange}
             className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
+            style={{ borderColor: 'var(--tg-theme-hint-color, #aaaaaa)', backgroundColor: 'var(--tg-theme-secondary-bg-color, #2a2a2a)', color: 'var(--tg-theme-text-color, #ffffff)' }}
           />
           <button
             onClick={handleCreateUser}
             disabled={isAdding}
             className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            style={{ backgroundColor: isAdding ? '#aaaaaa' : '#007bff', color: '#ffffff' }}
+            style={{ backgroundColor: isAdding ? 'var(--tg-theme-hint-color, #aaaaaa)' : 'var(--tg-theme-button-color, #007bff)', color: 'var(--tg-theme-button-text-color, #ffffff)' }}
           >
             Создать пользователя
           </button>
@@ -284,19 +294,19 @@ function ProfilePage() {
       </div>
 
       <div className="mb-6">
-        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
           Список пользователей
         </h3>
         {loading ? (
-          <p className="text-center" style={{ color: '#ffffff' }}>
+          <p className="text-center" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
             Загрузка пользователей...
           </p>
         ) : error ? (
-          <p className="text-center" style={{ color: '#ff0000' }}>
+          <p className="text-center" style={{ color: 'var(--tg-theme-error-color, #ff0000)' }}>
             {error}
           </p>
         ) : users.length === 0 ? (
-          <p className="text-center" style={{ color: '#aaaaaa' }}>
+          <p className="text-center" style={{ color: 'var(--tg-theme-hint-color, #aaaaaa)' }}>
             Пользователей нет
           </p>
         ) : (
@@ -305,19 +315,19 @@ function ProfilePage() {
               <div
                 key={u.id}
                 className="p-3 rounded-lg shadow-md flex justify-between items-center"
-                style={{ backgroundColor: '#1a1a1a' }}
+                style={{ backgroundColor: 'var(--tg-theme-secondary-bg-color, #1a1a1a)' }}
               >
                 <div className="space-y-1">
-                  <p className="font-bold" style={{ color: '#ffffff' }}>
+                  <p className="font-bold" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
                     ID: {u.id}
                   </p>
-                  <p className="text-sm" style={{ color: '#aaaaaa' }}>
+                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color, #aaaaaa)' }}>
                     Имя: {u.name}
                   </p>
-                  <p className="text-sm" style={{ color: '#aaaaaa' }}>
+                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color, #aaaaaa)' }}>
                     Email: {u.email}
                   </p>
-                  <p className="text-sm" style={{ color: '#aaaaaa' }}>
+                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color, #aaaaaa)' }}>
                     Бонусные баллы: {u.bonus_points}
                   </p>
                   {u.photo_url && (
@@ -334,8 +344,8 @@ function ProfilePage() {
                   disabled={isDeleting[u.id]}
                   className="p-2 rounded-md disabled:opacity-50"
                   style={{
-                    backgroundColor: isDeleting[u.id] ? '#aaaaaa' : '#dc3545',
-                    color: '#ffffff',
+                    backgroundColor: isDeleting[u.id] ? 'var(--tg-theme-hint-color, #aaaaaa)' : 'var(--tg-theme-destructive-text-color, #dc3545)',
+                    color: 'var(--tg-theme-button-text-color, #ffffff)',
                   }}
                 >
                   <FaTrash size={16} />
@@ -347,11 +357,11 @@ function ProfilePage() {
       </div>
 
       <div className="mb-6">
-        <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
+        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
           Управление ресторанами
         </h3>
-        <div className="mb-4 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
-          <h4 className="text-md font-bold mb-2" style={{ color: '#ffffff' }}>
+        <div className="mb-4 p-3 rounded-lg shadow-md" style={{ backgroundColor: 'var(--tg-theme-secondary-bg-color, #1a1a1a)' }}>
+          <h4 className="text-md font-bold mb-2" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
             Добавить новый ресторан
           </h4>
           <input
@@ -360,33 +370,33 @@ function ProfilePage() {
             value={newRestaurant}
             onChange={(e) => setNewRestaurant(e.target.value)}
             className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-            style={{ borderColor: '#aaaaaa', backgroundColor: '#2a2a2a', color: '#ffffff' }}
+            style={{ borderColor: 'var(--tg-theme-hint-color, #aaaaaa)', backgroundColor: 'var(--tg-theme-secondary-bg-color, #2a2a2a)', color: 'var(--tg-theme-text-color, #ffffff)' }}
           />
           <button
             onClick={handleAddRestaurant}
             disabled={isAdding || !newRestaurant}
             className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
             style={{
-              backgroundColor: isAdding ? '#aaaaaa' : '#007bff',
-              color: '#ffffff',
+              backgroundColor: isAdding ? 'var(--tg-theme-hint-color, #aaaaaa)' : 'var(--tg-theme-button-color, #007bff)',
+              color: 'var(--tg-theme-button-text-color, #ffffff)',
             }}
           >
             {isAdding ? 'Добавление...' : 'Добавить ресторан'}
           </button>
         </div>
-        <h4 className="text-md font-bold mb-2" style={{ color: '#ffffff' }}>
+        <h4 className="text-md font-bold mb-2" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
           Список ресторанов
         </h4>
         {loading ? (
-          <p className="text-center" style={{ color: '#ffffff' }}>
+          <p className="text-center" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
             Загрузка ресторанов...
           </p>
         ) : error ? (
-          <p className="text-center" style={{ color: '#ff0000' }}>
+          <p className="text-center" style={{ color: 'var(--tg-theme-error-color, #ff0000)' }}>
             {error}
           </p>
         ) : restaurants.length === 0 ? (
-          <p className="text-center" style={{ color: '#aaaaaa' }}>
+          <p className="text-center" style={{ color: 'var(--tg-theme-hint-color, #aaaaaa)' }}>
             Ресторанов нет
           </p>
         ) : (
@@ -395,10 +405,10 @@ function ProfilePage() {
               <div
                 key={restaurant.id}
                 className="p-3 rounded-lg shadow-md"
-                style={{ backgroundColor: '#1a1a1a' }}
+                style={{ backgroundColor: 'var(--tg-theme-secondary-bg-color, #1a1a1a)' }}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold" style={{ color: '#ffffff' }}>
+                  <span className="font-bold" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
                     ID: {restaurant.id}, Адрес: {restaurant.address}
                   </span>
                   <button
@@ -406,19 +416,19 @@ function ProfilePage() {
                     disabled={isDeleting[restaurant.id]}
                     className="p-2 rounded-md disabled:opacity-50"
                     style={{
-                      backgroundColor: isDeleting[restaurant.id] ? '#aaaaaa' : '#dc3545',
-                      color: '#ffffff',
+                      backgroundColor: isDeleting[restaurant.id] ? 'var(--tg-theme-hint-color, #aaaaaa)' : 'var(--tg-theme-destructive-text-color, #dc3545)',
+                      color: 'var(--tg-theme-button-text-color, #ffffff)',
                     }}
                   >
                     <FaTrash size={16} />
                   </button>
                 </div>
                 <div className="mt-2">
-                  <h5 className="text-sm font-medium" style={{ color: '#ffffff' }}>
+                  <h5 className="text-sm font-medium" style={{ color: 'var(--tg-theme-text-color, #ffffff)' }}>
                     Меню ресторана
                   </h5>
                   {menuItems[restaurant.id]?.length === 0 ? (
-                    <p className="text-sm" style={{ color: '#aaaaaa' }}>
+                    <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color, #aaaaaa)' }}>
                       Меню пусто
                     </p>
                   ) : (
@@ -427,9 +437,9 @@ function ProfilePage() {
                         <div
                           key={item.id}
                           className="flex justify-between items-center p-2 rounded-md"
-                          style={{ backgroundColor: '#2a2a2a' }}
+                          style={{ backgroundColor: 'var(--tg-theme-secondary-bg-color, #2a2a2a)' }}
                         >
-                          <span className="text-sm" style={{ color: '#aaaaaa' }}>
+                          <span className="text-sm" style={{ color: 'var(--tg-theme-hint-color, #aaaaaa)' }}>
                             ID: {item.id}, {item.name}, Цена: {item.price}
                           </span>
                           <button
@@ -437,8 +447,8 @@ function ProfilePage() {
                             disabled={isDeletingMenuItem[item.id]}
                             className="p-2 rounded-md disabled:opacity-50"
                             style={{
-                              backgroundColor: isDeletingMenuItem[item.id] ? '#aaaaaa' : '#dc3545',
-                              color: '#ffffff',
+                              backgroundColor: isDeletingMenuItem[item.id] ? 'var(--tg-theme-hint-color, #aaaaaa)' : 'var(--tg-theme-destructive-text-color, #dc3545)',
+                              color: 'var(--tg-theme-button-text-color, #ffffff)',
                             }}
                           >
                             <FaTrash size={16} />
