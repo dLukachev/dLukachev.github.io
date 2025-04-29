@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import BottomNav from './components/BottomNav.js';
+import BottomNav from './components/BottomNav';
 import RestaurantList from './components/RestaurantList';
 import CartPage from './components/CartPage';
 import MenuPage from './components/MenuPage';
@@ -8,6 +8,7 @@ import UsersPage from './components/UsersPage';
 import OrdersPage from './components/OrdersPage';
 import RestaurantsAdminPage from './components/RestaurantsAdminPage';
 import ReservationsPage from './components/ReservationsPage';
+import ProfilePage from './components/ProfilePage';
 import { AuthProvider } from './context/AuthContext';
 
 function AppContent() {
@@ -37,7 +38,7 @@ function AppContent() {
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/restaurants-admin" element={<RestaurantsAdminPage />} />
         <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
-        <Route path="/profile" element={<div className="p-4">Профиль (в разработке)</div>} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       <BottomNav />
     </div>
