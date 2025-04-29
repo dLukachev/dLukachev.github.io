@@ -103,19 +103,19 @@ function OrdersPage() {
   };
 
   if (authLoading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Авторизация...</p>;
+    return <p className="text-center">Авторизация...</p>;
   }
 
   if (!user) {
     return (
-      <p className="text-center text-[var(--tg-theme-text-color)]">
+      <p className="text-center">
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Загрузка заказов...</p>;
+    return <p className="text-center">Загрузка заказов...</p>;
   }
 
   if (error) {
@@ -123,33 +123,29 @@ function OrdersPage() {
   }
 
   return (
-    <div
-        className="p-4"
-        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
-    >
-      <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Мои заказы</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Мои заказы</h2>
       {orders.length === 0 ? (
-        <p className="text-[var(--tg-theme-hint-color)] text-center">У вас нет заказов</p>
+        <p className="text-center text-hint">У вас нет заказов</p>
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
             <div key={order.id} className="p-3 bg-white rounded-lg shadow-md">
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-[var(--tg-theme-text-color)]">Заказ #{order.id}</h3>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Тип заказа: {order.order_type}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">
+                <h3 className="text-lg font-bold">Заказ #{order.id}</h3>
+                <p className="text-sm text-hint">Тип заказа: {order.order_type}</p>
+                <p className="text-sm text-hint">
                   Дата: {new Date(order.created_at).toLocaleString()}
                 </p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Общая цена: {order.total_price} руб.</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Статус: {order.status}</p>
+                <p className="text-sm text-hint">Общая цена: {order.total_price} руб.</p>
+                <p className="text-sm text-hint">Статус: {order.status}</p>
               </div>
               <div className="flex gap-2 mt-2">
                 <select
                   value={order.status}
                   onChange={(e) => handleStatusChange(order.id, e.target.value)}
                   disabled={isUpdating[order.id]}
-                  className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                  style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+                  className="flex-1 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
                 >
                   <option value="PENDING">Ожидает</option>
                   <option value="CONFIRMED">Подтверждён</option>
@@ -159,17 +155,13 @@ function OrdersPage() {
                 <button
                   onClick={() => handleDeleteOrder(order.id)}
                   disabled={isDeleting[order.id]}
-                  className="p-2 rounded-md disabled:opacity-50"
-                  style={{
-                    backgroundColor: isDeleting[order.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
-                    color: 'var(--tg-theme-button-text-color)',
-                  }}
+                  className="p-2 rounded-md disabled:opacity-50 bg-destructive"
                 >
                   <FaTrash size={16} />
                 </button>
               </div>
               <div className="mt-4">
-                <p className="text-sm font-medium text-[var(--tg-theme-text-color)]">Товары:</p>
+                <p className="text-sm font-medium">Товары:</p>
                 {(order.order_items && order.order_items.length > 0) ? (
                   <ul className="space-y-2 mt-2">
                     {order.order_items.map((item) => (
@@ -177,13 +169,12 @@ function OrdersPage() {
                         key={item.id}
                         className="flex justify-between items-center p-2 bg-gray-100 rounded-md"
                       >
-                        <span className="text-sm text-[var(--tg-theme-hint-color)]">
+                        <span className="text-sm text-hint">
                           {item.menu_item_name}, Кол-во: {item.quantity}, Цена: {item.price} руб.
                         </span>
                         <button
                           onClick={() => handleRemoveItem(order.id, item.menu_item_id)}
-                          className="p-2 rounded-md"
-                          style={{ backgroundColor: 'var(--tg-theme-destructive-color, #dc3545)', color: 'var(--tg-theme-button-text-color)' }}
+                          className="p-2 rounded-md bg-destructive"
                         >
                           <FaTrash size={16} />
                         </button>
@@ -191,7 +182,7 @@ function OrdersPage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-[var(--tg-theme-hint-color)]">Элементы отсутствуют</p>
+                  <p className="text-sm text-hint">Элементы отсутствуют</p>
                 )}
               </div>
               {user.role === 'admin' && (
@@ -205,8 +196,7 @@ function OrdersPage() {
                         onChange={(e) =>
                           setNewItem((prev) => ({ ...prev, menu_item_id: e.target.value }))
                         }
-                        className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+                        className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
                       />
                       <input
                         type="number"
@@ -215,8 +205,7 @@ function OrdersPage() {
                         onChange={(e) =>
                           setNewItem((prev) => ({ ...prev, quantity: e.target.value }))
                         }
-                        className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                        style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+                        className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
                       />
                       <div className="flex space-x-2">
                         <button
@@ -225,17 +214,12 @@ function OrdersPage() {
                             isAddingItem[order.id] || !newItem.menu_item_id || !newItem.quantity
                           }
                           className="flex-1 px-4 py-2 rounded-lg shadow-md disabled:opacity-50 flex items-center justify-center"
-                          style={{
-                            backgroundColor: isAddingItem[order.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-button-color)',
-                            color: 'var(--tg-theme-button-text-color)',
-                          }}
                         >
                           <FaPlus className="mr-2" /> {isAddingItem[order.id] ? 'Добавление...' : 'Добавить'}
                         </button>
                         <button
                           onClick={() => setNewItem({ orderId: null, menu_item_id: '', quantity: '' })}
-                          className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center"
-                          style={{ backgroundColor: 'var(--tg-theme-destructive-color, #dc3545)', color: 'var(--tg-theme-button-text-color)' }}
+                          className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center bg-destructive"
                         >
                           <FaTimes className="mr-2" /> Отмена
                         </button>
@@ -245,7 +229,6 @@ function OrdersPage() {
                     <button
                       onClick={() => setNewItem({ orderId: order.id, menu_item_id: '', quantity: '' })}
                       className="w-full px-4 py-2 rounded-lg shadow-md flex items-center justify-center"
-                      style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
                     >
                       <FaPlus className="mr-2" /> Добавить элемент
                     </button>

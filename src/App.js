@@ -1,4 +1,5 @@
 import React from 'react';
+import './App.css';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import BottomNav from './components/BottomNav';
 import RestaurantList from './components/RestaurantList';

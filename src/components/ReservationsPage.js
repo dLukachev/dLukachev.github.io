@@ -114,19 +114,19 @@ function ReservationsPage() {
   };
 
   if (authLoading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Авторизация...</p>;
+    return <p className="text-center">Авторизация...</p>;
   }
 
   if (!user) {
     return (
-      <p className="text-center text-[var(--tg-theme-text-color)]">
+      <p className="text-center">
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Загрузка данных...</p>;
+    return <p className="text-center">Загрузка данных...</p>;
   }
 
   if (error) {
@@ -134,14 +134,11 @@ function ReservationsPage() {
   }
 
   return (
-    <div
-        className="p-4"
-        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
-    >
-      <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Бронирование столов в ресторане #{restaurantId}</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Бронирование столов в ресторане #{restaurantId}</h2>
       {user.role === 'admin' && (
         <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
-          <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Добавить новый стол</h3>
+          <h3 className="text-lg font-bold mb-2">Добавить новый стол</h3>
           <div className="space-y-2">
             <input
               type="number"
@@ -149,8 +146,7 @@ function ReservationsPage() {
               placeholder="Номер стола"
               value={newTable.table_number}
               onChange={handleNewTableChange}
-              className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             />
             <input
               type="number"
@@ -158,17 +154,12 @@ function ReservationsPage() {
               placeholder="Вместимость стола"
               value={newTable.capacity}
               onChange={handleNewTableChange}
-              className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             />
             <button
               onClick={handleCreateTable}
               disabled={isCreatingTable || !newTable.table_number || !newTable.capacity}
               className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-              style={{
-                backgroundColor: isCreatingTable ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-button-color)',
-                color: 'var(--tg-theme-button-text-color)',
-              }}
             >
               {isCreatingTable ? 'Добавление...' : 'Добавить стол'}
             </button>
@@ -176,14 +167,13 @@ function ReservationsPage() {
         </div>
       )}
       <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
-        <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Создать бронирование</h3>
+        <h3 className="text-lg font-bold mb-2">Создать бронирование</h3>
         <div className="space-y-2">
           <select
             name="table_number"
             value={newReservation.table_number}
             onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
           >
             <option value="">Выберите стол</option>
             {tables.map((table) => (
@@ -197,25 +187,20 @@ function ReservationsPage() {
             name="reservation_start"
             value={newReservation.reservation_start}
             onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
           />
           <button
             onClick={handleCreateReservation}
             disabled={isBooking || !newReservation.table_number || !newReservation.reservation_start}
             className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-            style={{
-              backgroundColor: isBooking ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-button-color)',
-              color: 'var(--tg-theme-button-text-color)',
-            }}
           >
             {isBooking ? 'Бронирование...' : 'Забронировать'}
           </button>
         </div>
       </div>
-      <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Мои бронирования</h3>
+      <h3 className="text-lg font-bold mb-2">Мои бронирования</h3>
       {reservations.length === 0 ? (
-        <p className="text-[var(--tg-theme-hint-color)] text-center">У вас нет бронирований</p>
+        <p className="text-center text-hint">У вас нет бронирований</p>
       ) : (
         <div className="space-y-4">
           {reservations.map((reservation) => (
@@ -224,23 +209,19 @@ function ReservationsPage() {
               className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
             >
               <div className="space-y-1">
-                <p className="font-bold text-[var(--tg-theme-text-color)]">Ресторан ID: {reservation.restaurant_id}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Адрес: {reservation.restaurant_address}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Стол №: {reservation.table_number}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">
+                <p className="font-bold">Ресторан ID: {reservation.restaurant_id}</p>
+                <p className="text-sm text-hint">Адрес: {reservation.restaurant_address}</p>
+                <p className="text-sm text-hint">Стол №: {reservation.table_number}</p>
+                <p className="text-sm text-hint">
                   Время: {new Date(reservation.reservation_start).toLocaleString()} -{' '}
                   {new Date(reservation.reservation_end).toLocaleString()}
                 </p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Статус: {reservation.status}</p>
+                <p className="text-sm text-hint">Статус: {reservation.status}</p>
               </div>
               <button
                 onClick={() => handleDeleteReservation(reservation.id)}
                 disabled={isDeletingReservation[reservation.id]}
-                className="p-2 rounded-md disabled:opacity-50"
-                style={{
-                  backgroundColor: isDeletingReservation[reservation.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
-                  color: 'var(--tg-theme-button-text-color)',
-                }}
+                className="p-2 rounded-md disabled:opacity-50 bg-destructive"
               >
                 <FaTrash size={16} />
               </button>
@@ -248,9 +229,9 @@ function ReservationsPage() {
           ))}
         </div>
       )}
-      <h3 className="text-lg font-bold mb-2 mt-4 text-[var(--tg-theme-text-color)]">Доступные столы</h3>
+      <h3 className="text-lg font-bold mb-2 mt-4">Доступные столы</h3>
       {tables.length === 0 ? (
-        <p className="text-[var(--tg-theme-hint-color)] text-center">Столов нет</p>
+        <p className="text-center text-hint">Столов нет</p>
       ) : (
         <div className="space-y-4">
           {tables.map((table) => (
@@ -258,16 +239,12 @@ function ReservationsPage() {
               key={table.table_number}
               className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
             >
-              <span className="font-bold text-[var(--tg-theme-text-color)]">Стол #{table.table_number}</span>
+              <span className="font-bold">Стол #{table.table_number}</span>
               {user.role === 'admin' && (
                 <button
                   onClick={() => handleDeleteTable(table.table_number)}
                   disabled={isDeletingTable[table.table_number]}
-                  className="p-2 rounded-md disabled:opacity-50"
-                  style={{
-                    backgroundColor: isDeletingTable[table.table_number] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
-                    color: 'var(--tg-theme-button-text-color)',
-                  }}
+                  className="p-2 rounded-md disabled:opacity-50 bg-destructive"
                 >
                   <FaTrash size={16} />
                 </button>

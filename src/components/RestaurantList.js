@@ -32,7 +32,7 @@ function RestaurantList() {
   }, [user]);
 
   if (authLoading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Авторизация...</p>;
+    return <p className="text-center">Авторизация...</p>;
   }
 
   if (authError) {
@@ -41,14 +41,14 @@ function RestaurantList() {
 
   if (!user || !user.id) {
     return (
-      <p className="text-center text-[var(--tg-theme-text-color)]">
+      <p className="text-center">
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Загрузка ресторанов...</p>;
+    return <p className="text-center">Загрузка ресторанов...</p>;
   }
 
   if (error) {
@@ -56,13 +56,10 @@ function RestaurantList() {
   }
 
   return (
-    <div
-        className="p-4"
-        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
-    >
-      <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Список ресторанов</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Список ресторанов</h2>
       {restaurants.length === 0 ? (
-        <p className="text-[var(--tg-theme-hint-color)] text-center">Ресторанов нет</p>
+        <p className="text-center text-hint">Ресторанов нет</p>
       ) : (
         <div className="grid gap-4">
           {restaurants.map((restaurant) => (
@@ -70,21 +67,15 @@ function RestaurantList() {
               key={restaurant.data.restaurants_id}
               className="p-3 bg-white rounded-lg shadow-md text-center"
             >
-              <h3 className="text-lg font-bold text-[var(--tg-theme-text-color)]">{restaurant.data.restaurants_address}</h3>
+              <h3 className="text-lg font-bold">{restaurant.data.restaurants_address}</h3>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <Link to={`/restaurants/${restaurant.data.restaurants_id}/menu`}>
-                  <button
-                    className="w-full px-4 py-2 rounded-lg shadow-md"
-                    style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
-                  >
+                  <button className="w-full px-4 py-2 rounded-lg shadow-md">
                     Меню
                   </button>
                 </Link>
                 <Link to={`/restaurants/${restaurant.data.restaurants_id}/reservations`}>
-                  <button
-                    className="w-full px-4 py-2 rounded-lg shadow-md"
-                    style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
-                  >
+                  <button className="w-full px-4 py-2 rounded-lg shadow-md">
                     Бронирование
                   </button>
                 </Link>
@@ -95,10 +86,7 @@ function RestaurantList() {
       )}
       {user.role === 'admin' && (
         <Link to="/restaurants-admin">
-          <button
-            className="w-full mt-4 px-4 py-2 rounded-lg shadow-md"
-            style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
-          >
+          <button className="w-full mt-4 px-4 py-2 rounded-lg shadow-md">
             Управление ресторанами
           </button>
         </Link>

@@ -1,3 +1,6 @@
+/* App.css */
+
+/* Сохраняем существующие стили */
 .App {
   text-align: center;
 }
@@ -14,18 +17,18 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--tg-theme-bg-color, #282c34); /* Используем Telegram-переменную с запасным значением */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--tg-theme-text-color, #ffffff); /* Обновляем цвет текста */
 }
 
 .App-link {
-  color: #61dafb;
+  color: var(--tg-theme-link-color, #61dafb); /* Обновляем цвет ссылки */
 }
 
 @keyframes App-logo-spin {
@@ -35,4 +38,116 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Добавляем стили для темной темы */
+
+/* Базовые стили для всего приложения */
+body {
+  background-color: var(--tg-theme-bg-color, #121212);
+  color: var(--tg-theme-text-color, #e0e0e0);
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Стили для элементов с className="text-center" */
+.text-center {
+  text-align: center;
+  color: var(--tg-theme-text-color, #e0e0e0); /* Явно задаём цвет текста */
+}
+
+/* Стили для подсказок (например, "Ресторанов нет") */
+.text-hint {
+  color: var(--tg-theme-hint-color, #b0b0b0);
+}
+
+/* Стили для кнопок */
+button {
+  background-color: var(--tg-theme-button-color, #1976d2);
+  color: var(--tg-theme-button-text-color, #ffffff);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: var(--tg-theme-hint-color, #b0b0b0);
+  cursor: not-allowed;
+}
+
+/* Стили для карточек (например, bg-white) */
+.bg-white {
+  background-color: #1e1e1e; /* Темный фон вместо белого */
+}
+
+/* Стили для инпутов */
+input {
+  background-color: #2a2a2a;
+  color: var(--tg-theme-text-color, #e0e0e0);
+  border: 1px solid var(--tg-theme-hint-color, #b0b0b0);
+  border-radius: 4px;
+  padding: 8px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--tg-theme-link-color, #1976d2);
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3);
+}
+
+/* Стили для карточек меню */
+.bg-gray-100 {
+  background-color: #2a2a2a;
+}
+
+/* Стили для текста в карточках меню */
+.text-sm {
+  color: var(--tg-theme-hint-color, #b0b0b0);
+}
+
+/* Стили для заголовков */
+h2, h3, h4 {
+  color: var(--tg-theme-text-color, #e0e0e0);
+}
+
+/* Стили для кнопок удаления */
+button.bg-destructive {
+  background-color: var(--tg-theme-destructive-color, #dc3545);
+}
+
+/* Добавляем в App.css */
+
+/* Стили для нижней навигации */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--tg-theme-secondary-bg-color, #1e1e1e);
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--tg-theme-hint-color, #b0b0b0);
+  text-decoration: none;
+}
+
+.nav-item.active {
+  color: var(--tg-theme-link-color, #1976d2);
+}
+
+.nav-item span {
+  font-size: 12px;
+}
+
+/* Стили для кнопки редактирования */
+button.bg-secondary {
+  background-color: var(--tg-theme-secondary-bg-color, #2a2a2a);
 }

@@ -68,19 +68,19 @@ function UsersPage() {
   };
 
   if (authLoading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Авторизация...</p>;
+    return <p className="text-center">Авторизация...</p>;
   }
 
   if (!user) {
     return (
-      <p className="text-center text-[var(--tg-theme-text-color)]">
+      <p className="text-center">
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Загрузка пользователей...</p>;
+    return <p className="text-center">Загрузка пользователей...</p>;
   }
 
   if (error) {
@@ -88,17 +88,14 @@ function UsersPage() {
   }
 
   if (user.role !== 'admin') {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Доступ только для администраторов</p>;
+    return <p className="text-center">Доступ только для администраторов</p>;
   }
 
   return (
-    <div
-        className="p-4"
-        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
-    >
-      <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Управление пользователями</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Управление пользователями</h2>
       <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
-        <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Создать нового пользователя</h3>
+        <h3 className="text-lg font-bold mb-2">Создать нового пользователя</h3>
         <div className="space-y-2">
           <input
             type="text"
@@ -106,8 +103,7 @@ function UsersPage() {
             placeholder="ID пользователя"
             value={newUser.id}
             onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
           />
           <input
             type="text"
@@ -115,8 +111,7 @@ function UsersPage() {
             placeholder="Имя"
             value={newUser.name}
             onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
           />
           <input
             type="email"
@@ -124,8 +119,7 @@ function UsersPage() {
             placeholder="Email"
             value={newUser.email}
             onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
           />
           <input
             type="number"
@@ -133,8 +127,7 @@ function UsersPage() {
             placeholder="Бонусные баллы"
             value={newUser.bonus_points}
             onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
           />
           <input
             type="text"
@@ -142,21 +135,19 @@ function UsersPage() {
             placeholder="URL фото (опционально)"
             value={newUser.photo_url}
             onChange={handleInputChange}
-            className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-            style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+            className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
           />
           <button
             onClick={handleCreateUser}
             className="w-full px-4 py-2 rounded-lg shadow-md"
-            style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
           >
             Создать пользователя
           </button>
         </div>
       </div>
-      <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Список пользователей</h3>
+      <h3 className="text-lg font-bold mb-2">Список пользователей</h3>
       {users.length === 0 ? (
-        <p className="text-[var(--tg-theme-hint-color)] text-center">Пользователей нет</p>
+        <p className="text-center text-hint">Пользователей нет</p>
       ) : (
         <div className="space-y-4">
           {users.map((user) => (
@@ -165,10 +156,10 @@ function UsersPage() {
               className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
             >
               <div className="space-y-1">
-                <p className="font-bold text-[var(--tg-theme-text-color)]">ID: {user.id}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Имя: {user.name}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Email: {user.email}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Бонусные баллы: {user.bonus_points}</p>
+                <p className="font-bold">ID: {user.id}</p>
+                <p className="text-sm text-hint">Имя: {user.name}</p>
+                <p className="text-sm text-hint">Email: {user.email}</p>
+                <p className="text-sm text-hint">Бонусные баллы: {user.bonus_points}</p>
                 {user.photo_url && (
                   <img
                     src={user.photo_url}
@@ -181,11 +172,7 @@ function UsersPage() {
               <button
                 onClick={() => handleDeleteUser(user.id)}
                 disabled={isDeleting[user.id]}
-                className="p-2 rounded-md disabled:opacity-50"
-                style={{
-                  backgroundColor: isDeleting[user.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
-                  color: 'var(--tg-theme-button-text-color)',
-                }}
+                className="p-2 rounded-md disabled:opacity-50 bg-destructive"
               >
                 <FaTrash size={16} />
               </button>

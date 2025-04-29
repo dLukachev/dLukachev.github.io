@@ -127,19 +127,19 @@ function MenuPage() {
   };
 
   if (authLoading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Авторизация...</p>;
+    return <p className="text-center">Авторизация...</p>;
   }
 
   if (!user) {
     return (
-      <p className="text-center text-[var(--tg-theme-text-color)]">
+      <p className="text-center">
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Загрузка меню...</p>;
+    return <p className="text-center">Загрузка меню...</p>;
   }
 
   if (error) {
@@ -147,14 +147,11 @@ function MenuPage() {
   }
 
   return (
-    <div
-        className="p-4"
-        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
-    >
-      <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Меню ресторана</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Меню ресторана</h2>
       {user.role === 'admin' && (
         <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
-          <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Добавить новый пункт меню</h3>
+          <h3 className="text-lg font-bold mb-2">Добавить новый пункт меню</h3>
           <div className="space-y-2">
             <input
               type="text"
@@ -162,8 +159,7 @@ function MenuPage() {
               placeholder="Название"
               value={newItemForm.name}
               onChange={handleNewItemChange}
-              className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             />
             <input
               type="number"
@@ -171,8 +167,7 @@ function MenuPage() {
               placeholder="Цена"
               value={newItemForm.price}
               onChange={handleNewItemChange}
-              className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             />
             <input
               type="text"
@@ -180,8 +175,7 @@ function MenuPage() {
               placeholder="Описание (опционально)"
               value={newItemForm.description}
               onChange={handleNewItemChange}
-              className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             />
             <input
               type="text"
@@ -189,17 +183,12 @@ function MenuPage() {
               placeholder="URL изображения (опционально)"
               value={newItemForm.image_url}
               onChange={handleNewItemChange}
-              className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             />
             <button
               onClick={handleCreateItem}
               disabled={isCreating || !newItemForm.name || !newItemForm.price}
               className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-              style={{
-                backgroundColor: isCreating ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-button-color)',
-                color: 'var(--tg-theme-button-text-color)',
-              }}
             >
               {isCreating ? 'Добавление...' : 'Добавить'}
             </button>
@@ -216,45 +205,39 @@ function MenuPage() {
                   name="name"
                   value={editForm.name}
                   onChange={handleEditChange}
-                  className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                  style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+                  className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
                 />
                 <input
                   type="number"
                   name="price"
                   value={editForm.price}
                   onChange={handleEditChange}
-                  className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                  style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+                  className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
                 />
                 <input
                   type="text"
                   name="description"
                   value={editForm.description}
                   onChange={handleEditChange}
-                  className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                  style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+                  className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
                 />
                 <input
                   type="text"
                   name="image_url"
                   value={editForm.image_url}
                   onChange={handleEditChange}
-                  className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-                  style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+                  className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
                 />
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleUpdateItem(item.id)}
                     className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center"
-                    style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
                   >
                     <FaSave className="mr-2" /> Сохранить
                   </button>
                   <button
                     onClick={() => setEditingItem(null)}
-                    className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center"
-                    style={{ backgroundColor: 'var(--tg-theme-destructive-color, #dc3545)', color: 'var(--tg-theme-button-text-color)' }}
+                    className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center bg-destructive"
                   >
                     <FaTimes className="mr-2" /> Отмена
                   </button>
@@ -268,26 +251,21 @@ function MenuPage() {
                   className="w-full h-24 object-cover rounded-md mb-2"
                   onError={(e) => (e.target.src = 'https://placehold.co/100x100')}
                 />
-                <h3 className="text-lg font-bold text-[var(--tg-theme-text-color)]">{item.name}</h3>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">{item.description}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Цена: {item.price} руб.</p>
+                <h3 className="text-lg font-bold">{item.name}</h3>
+                <p className="text-sm text-hint">{item.description}</p>
+                <p className="text-sm text-hint">Цена: {item.price} руб.</p>
                 <div className="flex space-x-2 mt-2">
                   <button
                     onClick={() => handleAddToCart(item)}
                     disabled={isAdding[item.id]}
                     className="flex-1 px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
-                    style={{
-                      backgroundColor: isAdding[item.id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-button-color)',
-                      color: 'var(--tg-theme-button-text-color)',
-                    }}
                   >
                     {isAdding[item.id] ? 'Добавление...' : 'В корзину'}
                   </button>
                   {user.role === 'admin' && (
                     <button
                       onClick={() => handleEditClick(item)}
-                      className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center"
-                      style={{ backgroundColor: 'var(--tg-theme-secondary-bg-color)', color: 'var(--tg-theme-text-color)' }}
+                      className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center bg-secondary"
                     >
                       <FaEdit className="mr-2" /> Редактировать
                     </button>
@@ -298,7 +276,7 @@ function MenuPage() {
           </div>
         ))}
       </div>
-      {menuItems.length === 0 && <p className="text-[var(--tg-theme-hint-color)] text-center">Меню пусто</p>}
+      {menuItems.length === 0 && <p className="text-center text-hint">Меню пусто</p>}
     </div>
   );
 }

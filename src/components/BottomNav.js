@@ -14,15 +14,15 @@ function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[var(--tg-theme-secondary-bg-color)] shadow-md flex justify-around py-2">
+    <div className="bottom-nav">
       {navItems.map((item) => (
         <Link
           key={item.to}
           to={item.to}
-          className={`flex flex-col items-center ${path === item.to ? 'text-[var(--tg-theme-link-color)]' : 'text-[var(--tg-theme-hint-color)]'}`}
+          className={`nav-item ${path === item.to ? 'active' : ''}`}
         >
           {item.icon}
-          <span className="text-xs">{item.label}</span>
+          <span>{item.label}</span>
         </Link>
       ))}
     </div>

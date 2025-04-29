@@ -75,19 +75,19 @@ function CartPage() {
   };
 
   if (authLoading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Авторизация...</p>;
+    return <p className="text-center">Авторизация...</p>;
   }
 
   if (!user) {
     return (
-      <p className="text-center text-[var(--tg-theme-text-color)]">
+      <p className="text-center">
         Пожалуйста, откройте приложение через Telegram для авторизации.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-center text-[var(--tg-theme-text-color)]">Загрузка корзины...</p>;
+    return <p className="text-center">Загрузка корзины...</p>;
   }
 
   if (error) {
@@ -95,43 +95,35 @@ function CartPage() {
   }
 
   return (
-    <div
-     className="p-4"
-     style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
-    >
-      <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Корзина</h2>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Корзина</h2>
       {cartItems.length === 0 ? (
-        <p className="text-[var(--tg-theme-hint-color)] text-center">Корзина пуста</p>
+        <p className="text-center text-hint">Корзина пуста</p>
       ) : (
         <div className="space-y-4">
           {cartItems.map((item) => (
             <div key={item.menu_item_id} className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center">
               <div className="space-y-1">
-                <p className="font-bold text-[var(--tg-theme-text-color)]">{item.name}</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Цена: {item.price} руб.</p>
-                <p className="text-sm text-[var(--tg-theme-hint-color)]">Количество: {item.quantity}</p>
+                <p className="font-bold">{item.name}</p>
+                <p className="text-sm text-hint">Цена: {item.price} руб.</p>
+                <p className="text-sm text-hint">Количество: {item.quantity}</p>
               </div>
               <button
                 onClick={() => handleRemoveFromCart(item.menu_item_id)}
                 disabled={isRemoving[item.menu_item_id]}
-                className="p-2 rounded-md disabled:opacity-50"
-                style={{
-                  backgroundColor: isRemoving[item.menu_item_id] ? 'var(--tg-theme-hint-color)' : 'var(--tg-theme-destructive-color, #dc3545)',
-                  color: 'var(--tg-theme-button-text-color)',
-                }}
+                className="p-2 rounded-md disabled:opacity-50 bg-destructive"
               >
                 <FaTrash size={16} />
               </button>
             </div>
           ))}
           <div className="mt-4">
-            <label htmlFor="orderType" className="block text-sm text-[var(--tg-theme-text-color)] mb-2">Тип заказа:</label>
+            <label htmlFor="orderType" className="block text-sm mb-2">Тип заказа:</label>
             <select
               id="orderType"
               value={orderType}
               onChange={(e) => setOrderType(e.target.value)}
-              className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
-              style={{ borderColor: 'var(--tg-theme-hint-color)' }}
+              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             >
               <option value="DINE_IN">Обед в ресторане</option>
               <option value="DELIVERY">Доставка</option>
@@ -141,7 +133,6 @@ function CartPage() {
           <button
             onClick={handleCreateOrder}
             className="w-full px-4 py-3 rounded-lg shadow-md"
-            style={{ backgroundColor: 'var(--tg-theme-button-color)', color: 'var(--tg-theme-button-text-color)' }}
           >
             Создать заказ
           </button>
