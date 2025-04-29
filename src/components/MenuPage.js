@@ -147,7 +147,10 @@ function MenuPage() {
   }
 
   return (
-    <div className="p-4">
+    <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+    >
       <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Меню ресторана</h2>
       {user.role === 'admin' && (
         <div className="mb-4 p-3 bg-white rounded-lg shadow-md">

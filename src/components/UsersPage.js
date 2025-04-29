@@ -92,7 +92,10 @@ function UsersPage() {
   }
 
   return (
-    <div className="p-4">
+    <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+    >
       <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Управление пользователями</h2>
       <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
         <h3 className="text-lg font-bold mb-2 text-[var(--tg-theme-text-color)]">Создать нового пользователя</h3>

@@ -56,7 +56,10 @@ function RestaurantList() {
   }
 
   return (
-    <div className="p-4">
+    <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+    >
       <h2 className="text-xl font-bold mb-4 text-[var(--tg-theme-text-color)]">Список ресторанов</h2>
       {restaurants.length === 0 ? (
         <p className="text-[var(--tg-theme-hint-color)] text-center">Ресторанов нет</p>

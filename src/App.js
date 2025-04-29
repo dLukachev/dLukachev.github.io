@@ -29,7 +29,10 @@ function AppContent() {
   }, [location]);
 
   return (
-    <div className="min-h-screen pb-16" style={{ backgroundColor: 'var(--tg-theme-bg-color)' }}>
+    <div
+      className="min-h-screen pb-16"
+      style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)' }}
+    >
       <Routes>
         <Route path="/" element={<RestaurantList />} />
         <Route path="/cart" element={<CartPage />} />
