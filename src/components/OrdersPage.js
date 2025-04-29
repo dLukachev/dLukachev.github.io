@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import api from '../services/api';
+import { AuthContext } from '../context/AuthContext.js';
+import api from '../services/api.js';
 import { FaTrash, FaPlus, FaTimes } from 'react-icons/fa';
 
 function OrdersPage() {

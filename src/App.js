@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import BottomNav from './BottomNav';
-import RestaurantList from './RestaurantList';
-import CartPage from './CartPage';
-import MenuPage from './MenuPage';
-import UsersPage from './UsersPage';
-import OrdersPage from './OrdersPage';
-import RestaurantsAdminPage from './RestaurantsAdminPage';
-import ReservationsPage from './ReservationsPage';
+import BottomNav from './components/BottomNav.js';
+import RestaurantList from './components/RestaurantList';
+import CartPage from './components/CartPage';
+import MenuPage from './components/MenuPage';
+import UsersPage from './components/UsersPage';
+import OrdersPage from './components/OrdersPage';
+import RestaurantsAdminPage from './components/RestaurantsAdminPage';
+import ReservationsPage from './components/ReservationsPage';
 import { AuthProvider } from './context/AuthContext';
 
 function AppContent() {
