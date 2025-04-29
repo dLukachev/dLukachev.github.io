@@ -21,10 +21,17 @@ function ProfilePage() {
   const [isAdding, setIsAdding] = useState(false);
   const [isDeleting, setIsDeleting] = useState({});
   const [isDeletingMenuItem, setIsDeletingMenuItem] = useState({});
+  const [authRetry, setAuthRetry] = useState(false); // Новое состояние для отслеживания попыток авторизации
 
   useEffect(() => {
     console.log('User from AuthContext:', user);
-    if (!user) return;
+    if (!user) {
+      // Если user отсутствует, попробуем подождать 3 секунды перед повторной попыткой
+      const timer = setTimeout(() => {
+        setAuthRetry(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
 
     const fetchData = async () => {
       try {
@@ -64,7 +71,7 @@ function ProfilePage() {
       }
     };
     fetchData();
-  }, [user]);
+  }, [user, authRetry]);
 
   const handleUserInputChange = (e) => {
     const { name, value } = e.target;
@@ -72,7 +79,7 @@ function ProfilePage() {
   };
 
   const handleCreateUser = async () => {
-    setIsAdding(true); // Добавлено для блокировки кнопки
+    setIsAdding(true);
     try {
       const userData = {
         ...newUser,
@@ -176,9 +183,10 @@ function ProfilePage() {
 
   if (!user || !user.id) {
     return (
-      <p className="text-center" style={{ color: '#ffffff' }}>
-        Пожалуйста, откройте приложение через Telegram для авторизации.
-      </p>
+      <div className="text-center" style={{ color: '#ffffff' }}>
+        <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>
+        {authRetry && <p>Попытка повторной авторизации...</p>}
+      </div>
     );
   }
 
@@ -186,7 +194,6 @@ function ProfilePage() {
     <div className="p-4" style={{ backgroundColor: '#000000' }}>
       <h2 className="text-xl font-bold mb-4" style={{ color: '#ffffff' }}>Профиль</h2>
 
-      {/* Информация о пользователе */}
       <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
         <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Информация о пользователе
@@ -215,7 +222,6 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Создание пользователей */}
       <div className="mb-6 p-3 rounded-lg shadow-md" style={{ backgroundColor: '#1a1a1a' }}>
         <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Создать нового пользователя
@@ -277,7 +283,6 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Список пользователей */}
       <div className="mb-6">
         <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Список пользователей
@@ -341,7 +346,6 @@ function ProfilePage() {
         )}
       </div>
 
-      {/* Управление ресторанами */}
       <div className="mb-6">
         <h3 className="text-lg font-bold mb-2" style={{ color: '#ffffff' }}>
           Управление ресторанами
