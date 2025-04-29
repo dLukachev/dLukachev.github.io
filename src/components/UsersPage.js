@@ -68,51 +68,43 @@ function UsersPage() {
     };
 
     if (authLoading) {
-        return <p>Авторизация...</p>;
+        return <p className="text-center text-gray-600">Авторизация...</p>;
     }
 
     if (!user) {
-        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
+        return (
+            <p className="text-center text-gray-600">
+                Пожалуйста, откройте приложение через Telegram для авторизации.
+            </p>
+        );
     }
 
     if (loading) {
-        return <p>Загрузка пользователей...</p>;
+        return <p className="text-center text-gray-600">Загрузка пользователей...</p>;
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <p className="text-center text-red-500">{error}</p>;
     }
 
     return (
-        <div>
-            <div style={{ marginBottom: '20px' }}>
-                <Link to="/">
-                    <button
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Назад
-                    </button>
-                </Link>
-            </div>
-            <h2>Управление пользователями</h2>
-
-            <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                <h3>Создать нового пользователя</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="container mx-auto p-4 max-w-md">
+            <Link to="/">
+                <button className="mb-4 px-4 py-2 bg-gray-200 text-black rounded-lg shadow-md hover:bg-gray-300 transition">
+                    Назад
+                </button>
+            </Link>
+            <h2 className="text-xl font-bold text-black mb-4">Управление пользователями</h2>
+            <div className="p-3 bg-white rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-bold text-black mb-2">Создать нового пользователя</h3>
+                <div className="space-y-2">
                     <input
                         type="text"
                         name="id"
                         placeholder="ID пользователя"
                         value={newUser.id}
                         onChange={handleInputChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="text"
@@ -120,7 +112,7 @@ function UsersPage() {
                         placeholder="Имя"
                         value={newUser.name}
                         onChange={handleInputChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="email"
@@ -128,7 +120,7 @@ function UsersPage() {
                         placeholder="Email"
                         value={newUser.email}
                         onChange={handleInputChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="number"
@@ -136,7 +128,7 @@ function UsersPage() {
                         placeholder="Бонусные баллы"
                         value={newUser.bonus_points}
                         onChange={handleInputChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="text"
@@ -144,52 +136,36 @@ function UsersPage() {
                         placeholder="URL фото (опционально)"
                         value={newUser.photo_url}
                         onChange={handleInputChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         onClick={handleCreateUser}
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                        }}
+                        className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
                     >
                         Создать пользователя
                     </button>
                 </div>
             </div>
-
-            <h3>Список пользователей</h3>
+            <h3 className="text-lg font-bold text-black mb-2">Список пользователей</h3>
             {users.length === 0 ? (
-                <p>Пользователей нет</p>
+                <p className="text-gray-600 text-center">Пользователей нет</p>
             ) : (
-                <div>
+                <div className="space-y-4">
                     {users.map((user) => (
                         <div
                             key={user.id}
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                margin: '10px 0',
-                                padding: '10px',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                            }}
+                            className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
                         >
-                            <div>
-                                <p style={{ margin: '5px 0' }}>ID: {user.id}</p>
-                                <p style={{ margin: '5px 0' }}>Имя: {user.name}</p>
-                                <p style={{ margin: '5px 0' }}>Email: {user.email}</p>
-                                <p style={{ margin: '5px 0' }}>Бонусные баллы: {user.bonus_points}</p>
+                            <div className="space-y-1">
+                                <p className="text-black font-medium">ID: {user.id}</p>
+                                <p className="text-sm text-gray-600">Имя: {user.name}</p>
+                                <p className="text-sm text-gray-600">Email: {user.email}</p>
+                                <p className="text-sm text-gray-600">Бонусные баллы: {user.bonus_points}</p>
                                 {user.photo_url && (
                                     <img
                                         src={user.photo_url}
                                         alt={user.name}
-                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                        className="w-12 h-12 object-cover rounded-md"
                                         onError={(e) => (e.target.src = 'https://placehold.co/50x50')}
                                     />
                                 )}
@@ -197,14 +173,9 @@ function UsersPage() {
                             <button
                                 onClick={() => handleDeleteUser(user.id)}
                                 disabled={isDeleting[user.id]}
-                                style={{
-                                    padding: '5px 10px',
-                                    backgroundColor: isDeleting[user.id] ? '#ccc' : '#dc3545',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '3px',
-                                    cursor: isDeleting[user.id] ? 'not-allowed' : 'pointer',
-                                }}
+                                className={`px-3 py-1 rounded-md text-white shadow-md ${
+                                    isDeleting[user.id] ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600'
+                                } transition`}
                             >
                                 {isDeleting[user.id] ? 'Удаление...' : 'Удалить'}
                             </button>

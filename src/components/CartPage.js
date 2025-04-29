@@ -12,7 +12,7 @@ function CartPage() {
     const [orderType, setOrderType] = useState('DINE_IN');
 
     useEffect(() => {
-        if (!user) return; // Ждем авторизацию
+        if (!user) return;
 
         const fetchCart = async () => {
             try {
@@ -75,85 +75,69 @@ function CartPage() {
     };
 
     if (authLoading) {
-        return <p>Авторизация...</p>;
+        return <p className="text-center text-gray-600">Авторизация...</p>;
     }
 
     if (!user) {
-        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
+        return (
+            <p className="text-center text-gray-600">
+                Пожалуйста, откройте приложение через Telegram для авторизации.
+            </p>
+        );
     }
 
     if (loading) {
-        return <p>Загрузка корзины...</p>;
+        return <p className="text-center text-gray-600">Загрузка корзины...</p>;
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <p className="text-center text-red-500">{error}</p>;
     }
 
     return (
-        <div>
-            <div style={{ marginBottom: '20px' }}>
-                <Link to="/">
-                    <button
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Назад
-                    </button>
-                </Link>
-            </div>
-            <h2>Корзина</h2>
+        <div className="container mx-auto p-4 max-w-md">
+            <Link to="/">
+                <button className="mb-4 px-4 py-2 bg-gray-200 text-black rounded-lg shadow-md hover:bg-gray-300 transition">
+                    Назад
+                </button>
+            </Link>
+            <h2 className="text-xl font-bold text-black mb-4">Корзина</h2>
             {cartItems.length === 0 ? (
-                <p>Корзина пуста</p>
+                <p className="text-gray-600 text-center">Корзина пуста</p>
             ) : (
-                <div>
+                <div className="space-y-4">
                     {cartItems.map((item) => (
                         <div
                             key={item.menu_item_id}
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                margin: '10px 0',
-                                padding: '10px',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                            }}
+                            className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
                         >
-                            <div>
-                                <p style={{ margin: '5px 0' }}>Название: {item.name}</p>
-                                <p style={{ margin: '5px 0' }}>Цена: {item.price} руб.</p>
-                                <p style={{ margin: '5px 0' }}>Количество: {item.quantity}</p>
+                            <div className="space-y-1">
+                                <p className="text-black font-medium">{item.name}</p>
+                                <p className="text-sm text-gray-600">Цена: {item.price} руб.</p>
+                                <p className="text-sm text-gray-600">Количество: {item.quantity}</p>
                             </div>
                             <button
                                 onClick={() => handleRemoveFromCart(item.menu_item_id)}
                                 disabled={isRemoving[item.menu_item_id]}
-                                style={{
-                                    padding: '5px 10px',
-                                    backgroundColor: isRemoving[item.menu_item_id] ? '#ccc' : '#dc3545',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '3px',
-                                    cursor: isRemoving[item.menu_item_id] ? 'not-allowed' : 'pointer',
-                                }}
+                                className={`px-3 py-1 rounded-md text-white shadow-md ${
+                                    isRemoving[item.menu_item_id]
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-pink-500 hover:bg-pink-600'
+                                } transition`}
                             >
                                 {isRemoving[item.menu_item_id] ? 'Удаление...' : 'Удалить'}
                             </button>
                         </div>
                     ))}
-                    <div style={{ marginTop: '20px', marginBottom: '10px' }}>
-                        <label htmlFor="orderType">Тип заказа: </label>
+                    <div className="mt-4">
+                        <label htmlFor="orderType" className="text-sm text-gray-600 mr-2">
+                            Тип заказа:
+                        </label>
                         <select
                             id="orderType"
                             value={orderType}
                             onChange={(e) => setOrderType(e.target.value)}
-                            style={{ padding: '5px', marginLeft: '10px', borderRadius: '3px' }}
+                            className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                         >
                             <option value="DINE_IN">Обед в ресторане</option>
                             <option value="DELIVERY">Доставка</option>
@@ -162,15 +146,7 @@ function CartPage() {
                     </div>
                     <button
                         onClick={handleCreateOrder}
-                        style={{
-                            marginTop: '10px',
-                            padding: '10px 20px',
-                            backgroundColor: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                        }}
+                        className="w-full mt-4 px-4 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
                     >
                         Создать заказ
                     </button>

@@ -34,7 +34,6 @@ function MenuPage() {
         const fetchMenu = async () => {
             try {
                 const data = await api.getMenu(restaurantId);
-                console.log('Данные меню:', data);
                 setMenuItems(data);
                 setLoading(false);
             } catch (error) {
@@ -127,51 +126,43 @@ function MenuPage() {
     };
 
     if (authLoading) {
-        return <p>Авторизация...</p>;
+        return <p className="text-center text-gray-600">Авторизация...</p>;
     }
 
     if (!user) {
-        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
+        return (
+            <p className="text-center text-gray-600">
+                Пожалуйста, откройте приложение через Telegram для авторизации.
+            </p>
+        );
     }
 
     if (loading) {
-        return <p>Загрузка меню...</p>;
+        return <p className="text-center text-gray-600">Загрузка меню...</p>;
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <p className="text-center text-red-500">{error}</p>;
     }
 
     return (
-        <div>
-            <div style={{ marginBottom: '20px' }}>
-                <Link to="/">
-                    <button
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Назад
-                    </button>
-                </Link>
-            </div>
-            <h2>Меню ресторана</h2>
-
-            <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                <h3>Добавить новый пункт меню</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <div className="container mx-auto p-4 max-w-md">
+            <Link to="/">
+                <button className="mb-4 px-4 py-2 bg-gray-200 text-black rounded-lg shadow-md hover:bg-gray-300 transition">
+                    Назад
+                </button>
+            </Link>
+            <h2 className="text-xl font-bold text-black mb-4">Меню ресторана</h2>
+            <div className="p-3 bg-white rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-bold text-black mb-2">Добавить новый пункт меню</h3>
+                <div className="space-y-2">
                     <input
                         type="text"
                         name="name"
                         placeholder="Название"
                         value={newItemForm.name}
                         onChange={handleNewItemChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="number"
@@ -179,7 +170,7 @@ function MenuPage() {
                         placeholder="Цена"
                         value={newItemForm.price}
                         onChange={handleNewItemChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="text"
@@ -187,7 +178,7 @@ function MenuPage() {
                         placeholder="Описание (опционально)"
                         value={newItemForm.description}
                         onChange={handleNewItemChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="text"
@@ -195,94 +186,64 @@ function MenuPage() {
                         placeholder="URL изображения (опционально)"
                         value={newItemForm.image_url}
                         onChange={handleNewItemChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         onClick={handleCreateItem}
                         disabled={isCreating || !newItemForm.name || !newItemForm.price}
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: isCreating ? '#ccc' : '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: isCreating ? 'not-allowed' : 'pointer',
-                        }}
+                        className={`w-full px-4 py-3 rounded-lg text-white shadow-md ${
+                            isCreating ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                        } transition`}
                     >
                         {isCreating ? 'Добавление...' : 'Добавить'}
                     </button>
                 </div>
             </div>
-
             {menuItems.length === 0 ? (
-                <p>Меню пусто</p>
+                <p className="text-gray-600 text-center">Меню пусто</p>
             ) : (
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                <div className="grid gap-4">
                     {menuItems.map((item) => (
-                        <div
-                            key={item.id || item.name}
-                            style={{
-                                width: '200px',
-                                margin: '10px',
-                                padding: '10px',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                                textAlign: 'center',
-                            }}
-                        >
+                        <div key={item.id || item.name} className="p-3 bg-white rounded-lg shadow-md">
                             {editingItem === item.id ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                <div className="space-y-2">
                                     <input
                                         type="text"
                                         name="name"
                                         value={editForm.name}
                                         onChange={handleEditChange}
-                                        style={{ padding: '5px' }}
+                                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                     <input
                                         type="number"
                                         name="price"
                                         value={editForm.price}
                                         onChange={handleEditChange}
-                                        style={{ padding: '5px' }}
+                                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                     <input
                                         type="text"
                                         name="description"
                                         value={editForm.description}
                                         onChange={handleEditChange}
-                                        style={{ padding: '5px' }}
+                                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                     <input
                                         type="text"
                                         name="image_url"
                                         value={editForm.image_url}
                                         onChange={handleEditChange}
-                                        style={{ padding: '5px' }}
+                                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                     <button
                                         onClick={() => handleUpdateItem(item.id)}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: '#28a745',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: 'pointer',
-                                        }}
+                                        className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
                                     >
                                         Сохранить
                                     </button>
                                     <button
                                         onClick={() => setEditingItem(null)}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: '#dc3545',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: 'pointer',
-                                        }}
+                                        className="w-full px-4 py-3 bg-pink-500 text-white rounded-lg shadow-md hover:bg-pink-600 transition"
                                     >
                                         Отмена
                                     </button>
@@ -292,40 +253,29 @@ function MenuPage() {
                                     <img
                                         src={item.image_url || 'https://placehold.co/100x100'}
                                         alt={item.name}
-                                        style={{ width: '100%', height: '100px', objectFit: 'cover' }}
+                                        className="w-full h-24 object-cover rounded-md mb-2"
                                         onError={(e) => (e.target.src = 'https://placehold.co/100x100')}
                                     />
-                                    <h3>{item.name}</h3>
-                                    <p>{item.description}</p>
-                                    <p>Цена: {item.price} руб.</p>
-                                    <button
-                                        onClick={() => handleAddToCart(item)}
-                                        disabled={isAdding[item.id]}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: isAdding[item.id] ? '#ccc' : '#007bff',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: isAdding[item.id] ? 'not-allowed' : 'pointer',
-                                            marginRight: '5px',
-                                        }}
-                                    >
-                                        {isAdding[item.id] ? 'Добавление...' : 'Добавить в корзину'}
-                                    </button>
-                                    <button
-                                        onClick={() => handleEditClick(item)}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: '#ffc107',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        Редактировать
-                                    </button>
+                                    <h3 className="text-lg font-bold text-black">{item.name}</h3>
+                                    <p className="text-sm text-gray-600">{item.description}</p>
+                                    <p className="text-sm text-gray-600">Цена: {item.price} руб.</p>
+                                    <div className="flex space-x-2 mt-2">
+                                        <button
+                                            onClick={() => handleAddToCart(item)}
+                                            disabled={isAdding[item.id]}
+                                            className={`flex-1 px-4 py-2 rounded-lg text-white shadow-md ${
+                                                isAdding[item.id] ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                                            } transition`}
+                                        >
+                                            {isAdding[item.id] ? 'Добавление...' : 'В корзину'}
+                                        </button>
+                                        <button
+                                            onClick={() => handleEditClick(item)}
+                                            className="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition"
+                                        >
+                                            Редактировать
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>

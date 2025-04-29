@@ -63,7 +63,7 @@ function RestaurantsAdminPage() {
             setMenuItems((prev) => ({ ...prev, [response.restaurant.id]: [] }));
             setNewRestaurant('');
             alert('Ресторан добавлен');
-        } catch (error) {
+        } catch ( Taleerror) {
             alert('Не удалось добавить ресторан: ' + error.message);
         } finally {
             setIsAdding(false);
@@ -91,7 +91,7 @@ function RestaurantsAdminPage() {
     const handleDeleteMenuItem = async (restaurantId, menuItemId) => {
         setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: true }));
         try {
-            await api.deleteMenuItem(restaurantId, menuItemId); // Физическое удаление
+            await api.deleteMenuItem(restaurantId, menuItemId);
             setMenuItems((prev) => ({
                 ...prev,
                 [restaurantId]: prev[restaurantId].filter((item) => item.id !== menuItemId),
@@ -105,141 +105,104 @@ function RestaurantsAdminPage() {
     };
 
     if (authLoading) {
-        return <p>Авторизация...</p>;
+        return <p className="text-center text-gray-600">Авторизация...</p>;
     }
 
     if (authError) {
-        return <p>Ошибка авторизации: {authError}</p>;
+        return <p className="text-center text-red-500">Ошибка авторизации: {authError}</p>;
     }
 
     if (!user || !user.id) {
-        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
+        return (
+            <p className="text-center text-gray-600">
+                Пожалуйста, откройте приложение через Telegram для авторизации.
+            </p>
+        );
     }
 
     if (loading) {
-        return <p>Загрузка ресторанов...</p>;
+        return <p className="text-center text-gray-600">Загрузка ресторанов...</p>;
     }
 
     if (error) {
-        return <p>Ошибка загрузки ресторанов: {error}</p>;
+        return <p className="text-center text-red-500">Ошибка загрузки ресторанов: {error}</p>;
     }
 
     return (
-        <div>
-            <div style={{ marginBottom: '20px' }}>
-                <Link to="/">
-                    <button
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Назад
-                    </button>
-                </Link>
-            </div>
-            <h2>Управление ресторанами</h2>
-
-            <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                <h3>Добавить новый ресторан</h3>
+        <div className="container mx-auto p-4 max-w-md">
+            <Link to="/">
+                <button className="mb-4 px-4 py-2 bg-gray-200 text-black rounded-lg shadow-md hover:bg-gray-300 transition">
+                    Назад
+                </button>
+            </Link>
+            <h2 className="text-xl font-bold text-black mb-4">Управление ресторанами</h2>
+            <div className="p-3 bg-white rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-bold text-black mb-2">Добавить новый ресторан</h3>
                 <input
                     type="text"
                     placeholder="Адрес ресторана"
                     value={newRestaurant}
                     onChange={(e) => setNewRestaurant(e.target.value)}
-                    style={{ width: '100%', padding: '5px', marginBottom: '10px' }}
+                    className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                 />
                 <button
                     onClick={handleAddRestaurant}
                     disabled={isAdding || !newRestaurant}
-                    style={{
-                        padding: '5px 10px',
-                        backgroundColor: isAdding ? '#ccc' : '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '3px',
-                        cursor: isAdding ? 'not-allowed' : 'pointer',
-                    }}
+                    className={`w-full px-4 py-3 rounded-lg text-white shadow-md ${
+                        isAdding ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                    } transition`}
                 >
                     {isAdding ? 'Добавление...' : 'Добавить ресторан'}
                 </button>
             </div>
-
-            <h3>Список ресторанов</h3>
+            <h3 className="text-lg font-bold text-black mb-2">Список ресторанов</h3>
             {restaurants.length === 0 ? (
-                <p>Ресторанов нет</p>
+                <p className="text-gray-600 text-center">Ресторанов нет</p>
             ) : (
-                <div>
+                <div className="space-y-4">
                     {restaurants.map((restaurant) => (
                         <div
                             key={restaurant.data.restaurants_id}
-                            style={{
-                                padding: '10px',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                                marginBottom: '10px',
-                            }}
+                            className="p-3 bg-white rounded-lg shadow-md"
                         >
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    marginBottom: '10px',
-                                }}
-                            >
-                                <span>ID: {restaurant.data.restaurants_id}, Адрес: {restaurant.data.restaurants_address}</span>
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-black font-medium">
+                                    ID: {restaurant.data.restaurants_id}, Адрес: {restaurant.data.restaurants_address}
+                                </span>
                                 <button
                                     onClick={() => handleDeleteRestaurant(restaurant.data.restaurants_id)}
                                     disabled={isDeleting[restaurant.data.restaurants_id]}
-                                    style={{
-                                        padding: '5px 10px',
-                                        backgroundColor: isDeleting[restaurant.data.restaurants_id] ? '#ccc' : '#dc3545',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '3px',
-                                        cursor: isDeleting[restaurant.data.restaurants_id] ? 'not-allowed' : 'pointer',
-                                    }}
+                                    className={`px-3 py-1 rounded-md text-white shadow-md ${
+                                        isDeleting[restaurant.data.restaurants_id]
+                                            ? 'bg-gray-400 cursor-not-allowed'
+                                            : 'bg-pink-500 hover:bg-pink-600'
+                                    } transition`}
                                 >
-                                    {isDeleting[restaurant.data.restaurants_id] ? 'Удаление...' : 'Удалить ресторан'}
+                                    {isDeleting[restaurant.data.restaurants_id] ? 'Удаление...' : 'Удалить'}
                                 </button>
                             </div>
-
-                            <div style={{ marginLeft: '20px' }}>
-                                <h4>Меню ресторана</h4>
+                            <div className="mt-2">
+                                <h4 className="text-sm text-gray-600 font-medium">Меню ресторана</h4>
                                 {menuItems[restaurant.data.restaurants_id]?.length === 0 ? (
-                                    <p>Меню пусто</p>
+                                    <p className="text-sm text-gray-600">Меню пусто</p>
                                 ) : (
-                                    <div>
+                                    <div className="space-y-2 mt-2">
                                         {menuItems[restaurant.data.restaurants_id]?.map((item) => (
                                             <div
                                                 key={item.id}
-                                                style={{
-                                                    padding: '5px',
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '3px',
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                    marginBottom: '5px',
-                                                }}
+                                                className="flex justify-between items-center p-2 bg-gray-100 rounded-md"
                                             >
-                                                <span>ID: {item.id}, Название: {item.name}, Цена: {item.price}</span>
+                                                <span className="text-sm text-gray-600">
+                                                    ID: {item.id}, {item.name}, Цена: {item.price}
+                                                </span>
                                                 <button
                                                     onClick={() => handleDeleteMenuItem(restaurant.data.restaurants_id, item.id)}
                                                     disabled={isDeletingMenuItem[item.id]}
-                                                    style={{
-                                                        padding: '3px 6px',
-                                                        backgroundColor: isDeletingMenuItem[item.id] ? '#ccc' : '#dc3545',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: '3px',
-                                                        cursor: isDeletingMenuItem[item.id] ? 'not-allowed' : 'pointer',
-                                                    }}
+                                                    className={`px-2 py-1 rounded-md text-white shadow-md ${
+                                                        isDeletingMenuItem[item.id]
+                                                            ? 'bg-gray-400 cursor-not-allowed'
+                                                            : 'bg-pink-500 hover:bg-pink-600'
+                                                    } transition`}
                                                 >
                                                     {isDeletingMenuItem[item.id] ? 'Удаление...' : 'Удалить'}
                                                 </button>

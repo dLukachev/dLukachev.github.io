@@ -12,7 +12,7 @@ function RestaurantList() {
     useEffect(() => {
         if (!user || !user.id) {
             setLoading(false);
-            return; // Если user или user.id отсутствует, не делаем запрос
+            return;
         }
 
         const fetchRestaurants = async () => {
@@ -32,74 +32,54 @@ function RestaurantList() {
     }, [user]);
 
     if (authLoading) {
-        return <p>Авторизация...</p>;
+        return <p className="text-center text-gray-600">Авторизация...</p>;
     }
 
     if (authError) {
-        return <p>Ошибка авторизации: {authError}</p>;
+        return <p className="text-center text-red-500">Ошибка авторизации: {authError}</p>;
     }
 
     if (!user || !user.id) {
-        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
+        return (
+            <p className="text-center text-gray-600">
+                Пожалуйста, откройте приложение через Telegram для авторизации.
+            </p>
+        );
     }
 
     if (loading) {
-        return <p>Загрузка ресторанов...</p>;
+        return <p className="text-center text-gray-600">Загрузка ресторанов...</p>;
     }
 
     if (error) {
-        return <p>Ошибка загрузки ресторанов: {error}</p>;
+        return <p className="text-center text-red-500">Ошибка загрузки ресторанов: {error}</p>;
     }
 
     return (
-        <div>
-            <h2>Список ресторанов</h2>
+        <div className="container mx-auto p-4 max-w-md">
+            <h2 className="text-xl font-bold text-black mb-4">Список ресторанов</h2>
             {restaurants.length === 0 ? (
-                <p>Ресторанов нет</p>
+                <p className="text-gray-600 text-center">Ресторанов нет</p>
             ) : (
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                <div className="grid gap-4">
                     {restaurants.map((restaurant) => (
                         <div
                             key={restaurant.data.restaurants_id}
-                            style={{
-                                width: '200px',
-                                margin: '10px',
-                                padding: '10px',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                                textAlign: 'center',
-                            }}
+                            className="p-3 bg-white rounded-lg shadow-md text-center"
                         >
-                            <h3>{restaurant.data.restaurants_address}</h3>
-                            <Link to={`/restaurants/${restaurant.data.restaurants_id}/menu`}>
-                                <button
-                                    style={{
-                                        padding: '5px 10px',
-                                        backgroundColor: '#007bff',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        marginRight: '5px',
-                                    }}
-                                >
-                                    Посмотреть меню
-                                </button>
-                            </Link>
-                            <Link to={`/restaurants/${restaurant.data.restaurants_id}/reservations`}>
-                                <button
-                                    style={{
-                                        padding: '5px 10px',
-                                        backgroundColor: '#28a745',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    Забронировать стол
-                                </button>
-                            </Link>
+                            <h3 className="text-lg font-bold text-black">{restaurant.data.restaurants_address}</h3>
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <Link to={`/restaurants/${restaurant.data.restaurants_id}/menu`}>
+                                    <button className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
+                                        Меню
+                                    </button>
+                                </Link>
+                                <Link to={`/restaurants/${restaurant.data.restaurants_id}/reservations`}>
+                                    <button className="w-full px-4 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">
+                                        Бронирование
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
                     ))}
                 </div>

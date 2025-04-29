@@ -113,51 +113,43 @@ function ReservationsPage() {
     };
 
     if (authLoading) {
-        return <p>Авторизация...</p>;
+        return <p className="text-center text-gray-600">Авторизация...</p>;
     }
 
     if (!user) {
-        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
+        return (
+            <p className="text-center text-gray-600">
+                Пожалуйста, откройте приложение через Telegram для авторизации.
+            </p>
+        );
     }
 
     if (loading) {
-        return <p>Загрузка данных...</p>;
+        return <p className="text-center text-gray-600">Загрузка данных...</p>;
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <p className="text-center text-red-500">{error}</p>;
     }
 
     return (
-        <div>
-            <div style={{ marginBottom: '20px' }}>
-                <Link to="/">
-                    <button
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Назад
-                    </button>
-                </Link>
-            </div>
-            <h2>Бронирование столов в ресторане #{restaurantId}</h2>
-
-            <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                <h3>Добавить новый стол</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="container mx-auto p-4 max-w-md">
+            <Link to="/">
+                <button className="mb-4 px-4 py-2 bg-gray-200 text-black rounded-lg shadow-md hover:bg-gray-300 transition">
+                    Назад
+                </button>
+            </Link>
+            <h2 className="text-xl font-bold text-black mb-4">Бронирование столов в ресторане #{restaurantId}</h2>
+            <div className="p-3 bg-white rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-bold text-black mb-2">Добавить новый стол</h3>
+                <div className="space-y-2">
                     <input
                         type="number"
                         name="table_number"
                         placeholder="Номер стола"
                         value={newTable.table_number}
                         onChange={handleNewTableChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="number"
@@ -165,33 +157,27 @@ function ReservationsPage() {
                         placeholder="Вместимость стола"
                         value={newTable.capacity}
                         onChange={handleNewTableChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         onClick={handleCreateTable}
                         disabled={isCreatingTable || !newTable.table_number || !newTable.capacity}
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: isCreatingTable ? '#ccc' : '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: isCreatingTable ? 'not-allowed' : 'pointer',
-                        }}
+                        className={`w-full px-4 py-3 rounded-lg text-white shadow-md ${
+                            isCreatingTable ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                        } transition`}
                     >
                         {isCreatingTable ? 'Добавление...' : 'Добавить стол'}
                     </button>
                 </div>
             </div>
-
-            <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                <h3>Создать бронирование</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="p-3 bg-white rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-bold text-black mb-2">Создать бронирование</h3>
+                <div className="space-y-2">
                     <select
                         name="table_number"
                         value={newReservation.table_number}
                         onChange={handleInputChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="">Выберите стол</option>
                         {tables.map((table) => (
@@ -205,61 +191,47 @@ function ReservationsPage() {
                         name="reservation_start"
                         value={newReservation.reservation_start}
                         onChange={handleInputChange}
-                        style={{ padding: '5px' }}
+                        className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         onClick={handleCreateReservation}
                         disabled={isBooking || !newReservation.table_number || !newReservation.reservation_start}
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: isBooking ? '#ccc' : '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: isBooking ? 'not-allowed' : 'pointer',
-                        }}
+                        className={`w-full px-4 py-3 rounded-lg text-white shadow-md ${
+                            isBooking ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                        } transition`}
                     >
                         {isBooking ? 'Бронирование...' : 'Забронировать'}
                     </button>
                 </div>
             </div>
-
-            <h3>Мои бронирования</h3>
+            <h3 className="text-lg font-bold text-black mb-2">Мои бронирования</h3>
             {reservations.length === 0 ? (
-                <p>У вас нет бронирований</p>
+                <p className="text-gray-600 text-center">У вас нет бронирований</p>
             ) : (
-                <div>
+                <div className="space-y-4">
                     {reservations.map((reservation) => (
                         <div
                             key={reservation.id}
-                            style={{
-                                padding: '10px',
-                                margin: '5px 0',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                            }}
+                            className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
                         >
-                            <div>
-                                <p>Ресторан ID: {reservation.restaurant_id}</p>
-                                <p>Адрес ресторана: {reservation.restaurant_address}</p>
-                                <p>Стол №: {reservation.table_number}</p>
-                                <p>Время: {new Date(reservation.reservation_start).toLocaleString()} - {new Date(reservation.reservation_end).toLocaleString()}</p>
-                                <p>Статус: {reservation.status}</p>
+                            <div className="space-y-1">
+                                <p className="text-black font-medium">Ресторан ID: {reservation.restaurant_id}</p>
+                                <p className="text-sm text-gray-600">Адрес: {reservation.restaurant_address}</p>
+                                <p className="text-sm text-gray-600">Стол №: {reservation.table_number}</p>
+                                <p className="text-sm text-gray-600">
+                                    Время: {new Date(reservation.reservation_start).toLocaleString()} -{' '}
+                                    {new Date(reservation.reservation_end).toLocaleString()}
+                                </p>
+                                <p className="text-sm text-gray-600">Статус: {reservation.status}</p>
                             </div>
                             <button
                                 onClick={() => handleDeleteReservation(reservation.id)}
                                 disabled={isDeletingReservation[reservation.id]}
-                                style={{
-                                    padding: '5px 10px',
-                                    backgroundColor: isDeletingReservation[reservation.id] ? '#ccc' : '#dc3545',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '3px',
-                                    cursor: isDeletingReservation[reservation.id] ? 'not-allowed' : 'pointer',
-                                }}
+                                className={`px-3 py-1 rounded-md text-white shadow-md ${
+                                    isDeletingReservation[reservation.id]
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-pink-500 hover:bg-pink-600'
+                                } transition`}
                             >
                                 {isDeletingReservation[reservation.id] ? 'Удаление...' : 'Удалить'}
                             </button>
@@ -267,37 +239,25 @@ function ReservationsPage() {
                     ))}
                 </div>
             )}
-
-            <h3>Доступные столы</h3>
+            <h3 className="text-lg font-bold text-black mb-2 mt-4">Доступные столы</h3>
             {tables.length === 0 ? (
-                <p>Столов нет</p>
+                <p className="text-gray-600 text-center">Столов нет</p>
             ) : (
-                <div>
+                <div className="space-y-4">
                     {tables.map((table) => (
                         <div
                             key={table.table_number}
-                            style={{
-                                padding: '10px',
-                                margin: '5px 0',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                            }}
+                            className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center"
                         >
-                            <span>Стол #{table.table_number}</span>
+                            <span className="text-black font-medium">Стол #{table.table_number}</span>
                             <button
                                 onClick={() => handleDeleteTable(table.table_number)}
                                 disabled={isDeletingTable[table.table_number]}
-                                style={{
-                                    padding: '5px 10px',
-                                    backgroundColor: isDeletingTable[table.table_number] ? '#ccc' : '#dc3545',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '3px',
-                                    cursor: isDeletingTable[table.table_number] ? 'not-allowed' : 'pointer',
-                                }}
+                                className={`px-3 py-1 rounded-md text-white shadow-md ${
+                                    isDeletingTable[table.table_number]
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-pink-500 hover:bg-pink-600'
+                                } transition`}
                             >
                                 {isDeletingTable[table.table_number] ? 'Удаление...' : 'Удалить'}
                             </button>

@@ -103,132 +103,90 @@ function OrdersPage() {
     };
 
     if (authLoading) {
-        return <p>Авторизация...</p>;
+        return <p className="text-center text-gray-600">Авторизация...</p>;
     }
 
     if (!user) {
-        return <p>Пожалуйста, откройте приложение через Telegram для авторизации.</p>;
+        return (
+            <p className="text-center text-gray-600">
+                Пожалуйста, откройте приложение через Telegram для авторизации.
+            </p>
+        );
     }
 
     if (loading) {
-        return <p>Загрузка заказов...</p>;
+        return <p className="text-center text-gray-600">Загрузка заказов...</p>;
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <p className="text-center text-red-500">{error}</p>;
     }
 
     return (
-        <div>
-            <div style={{ marginBottom: '20px' }}>
-                <Link to="/">
-                    <button
-                        style={{
-                            padding: '5px 10px',
-                            backgroundColor: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Назад
-                    </button>
-                </Link>
-            </div>
-            <h2>Мои заказы</h2>
+        <div className="container mx-auto p-4 max-w-md">
+            <Link to="/">
+                <button className="mb-4 px-4 py-2 bg-gray-200 text-black rounded-lg shadow-md hover:bg-gray-300 transition">
+                    Назад
+                </button>
+            </Link>
+            <h2 className="text-xl font-bold text-black mb-4">Мои заказы</h2>
             {orders.length === 0 ? (
-                <p>У вас нет заказов</p>
+                <p className="text-gray-600 text-center">У вас нет заказов</p>
             ) : (
-                <div>
+                <div className="space-y-4">
                     {orders.map((order) => (
                         <div
                             key={order.id}
-                            style={{
-                                margin: '10px 0',
-                                padding: '10px',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                            }}
+                            className="p-3 bg-white rounded-lg shadow-md"
                         >
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <div>
-                                    <h3 style={{ margin: 0 }}>Заказ #{order.id}</h3>
-                                    <p style={{ margin: '5px 0' }}>Тип заказа: {order.order_type}</p>
-                                    <p style={{ margin: '5px 0' }}>
-                                        Дата: {new Date(order.created_at).toLocaleString()}
-                                    </p>
-                                    <p style={{ margin: '5px 0' }}>
-                                        Общая цена: {order.total_price} руб.
-                                    </p>
-                                    <p style={{ margin: '5px 0' }}>Статус: {order.status}</p>
-                                </div>
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <select
-                                        value={order.status}
-                                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                        disabled={isUpdating[order.id]}
-                                        style={{
-                                            padding: '5px',
-                                            borderRadius: '3px',
-                                            cursor: isUpdating[order.id] ? 'not-allowed' : 'pointer',
-                                        }}
-                                    >
-                                        <option value="PENDING">Ожидает</option>
-                                        <option value="CONFIRMED">Подтверждён</option>
-                                        <option value="COMPLETED">Завершён</option>
-                                        <option value="CANCELLED">Отменён</option>
-                                    </select>
-                                    <button
-                                        onClick={() => handleDeleteOrder(order.id)}
-                                        disabled={isDeleting[order.id]}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: isDeleting[order.id] ? '#ccc' : '#dc3545',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: isDeleting[order.id] ? 'not-allowed' : 'pointer',
-                                        }}
-                                    >
-                                        {isDeleting[order.id] ? 'Удаление...' : 'Удалить заказ'}
-                                    </button>
-                                </div>
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-bold text-black">Заказ #{order.id}</h3>
+                                <p className="text-sm text-gray-600">Тип заказа: {order.order_type}</p>
+                                <p className="text-sm text-gray-600">
+                                    Дата: {new Date(order.created_at).toLocaleString()}
+                                </p>
+                                <p className="text-sm text-gray-600">Общая цена: {order.total_price} руб.</p>
+                                <p className="text-sm text-gray-600">Статус: {order.status}</p>
                             </div>
-
-                            <div style={{ marginTop: '10px' }}>
-                                <p style={{ margin: '5px 0' }}>Товары:</p>
+                            <div className="flex gap-2 mt-2">
+                                <select
+                                    value={order.status}
+                                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                    disabled={isUpdating[order.id]}
+                                    className={`flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        isUpdating[order.id] ? 'cursor-not-allowed' : ''
+                                    }`}
+                                >
+                                    <option value="PENDING">Ожидает</option>
+                                    <option value="CONFIRMED">Подтверждён</option>
+                                    <option value="COMPLETED">Завершён</option>
+                                    <option value="CANCELLED">Отменён</option>
+                                </select>
+                                <button
+                                    onClick={() => handleDeleteOrder(order.id)}
+                                    disabled={isDeleting[order.id]}
+                                    className={`px-3 py-1 rounded-md text-white shadow-md ${
+                                        isDeleting[order.id] ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600'
+                                    } transition`}
+                                >
+                                    {isDeleting[order.id] ? 'Удаление...' : 'Удалить'}
+                                </button>
+                            </div>
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-600 font-medium">Товары:</p>
                                 {(order.order_items && order.order_items.length > 0) ? (
-                                    <ul>
+                                    <ul className="space-y-2 mt-2">
                                         {order.order_items.map((item) => (
                                             <li
                                                 key={item.id}
-                                                style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                    padding: '5px 0',
-                                                }}
+                                                className="flex justify-between items-center p-2 bg-gray-100 rounded-md"
                                             >
-                                                <span>
-                                                    Название: {item.menu_item_name}, Количество: {item.quantity}, Цена: {item.price} руб.
+                                                <span className="text-sm text-gray-600">
+                                                    {item.menu_item_name}, Кол-во: {item.quantity}, Цена: {item.price} руб.
                                                 </span>
                                                 <button
                                                     onClick={() => handleRemoveItem(order.id, item.menu_item_id)}
-                                                    style={{
-                                                        padding: '2px 5px',
-                                                        backgroundColor: '#dc3545',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: '3px',
-                                                        cursor: 'pointer',
-                                                    }}
+                                                    className="px-2 py-1 bg-pink-500 text-white rounded-md shadow-md hover:bg-pink-600 transition"
                                                 >
                                                     Удалить
                                                 </button>
@@ -236,14 +194,12 @@ function OrdersPage() {
                                         ))}
                                     </ul>
                                 ) : (
-                                    <p>Элементы отсутствуют</p>
+                                    <p className="text-sm text-gray-600">Элементы отсутствуют</p>
                                 )}
                             </div>
-
-                            <div style={{ marginTop: '10px' }}>
-                                <h4>Добавить элемент в заказ</h4>
+                            <div className="mt-4">
                                 {newItem.orderId === order.id ? (
-                                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                    <div className="space-y-2">
                                         <input
                                             type="number"
                                             placeholder="ID пункта меню"
@@ -251,7 +207,7 @@ function OrdersPage() {
                                             onChange={(e) =>
                                                 setNewItem((prev) => ({ ...prev, menu_item_id: e.target.value }))
                                             }
-                                            style={{ padding: '5px' }}
+                                            className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         />
                                         <input
                                             type="number"
@@ -260,51 +216,34 @@ function OrdersPage() {
                                             onChange={(e) =>
                                                 setNewItem((prev) => ({ ...prev, quantity: e.target.value }))
                                             }
-                                            style={{ padding: '5px' }}
+                                            className="p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         />
-                                        <button
-                                            onClick={() => handleAddItem(order.id)}
-                                            disabled={
-                                                isAddingItem[order.id] || !newItem.menu_item_id || !newItem.quantity
-                                            }
-                                            style={{
-                                                padding: '5px 10px',
-                                                backgroundColor: isAddingItem[order.id] ? '#ccc' : '#28a745',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '3px',
-                                                cursor: isAddingItem[order.id] ? 'not-allowed' : 'pointer',
-                                            }}
-                                        >
-                                            {isAddingItem[order.id] ? 'Добавление...' : 'Добавить'}
-                                        </button>
-                                        <button
-                                            onClick={() => setNewItem({ orderId: null, menu_item_id: '', quantity: '' })}
-                                            style={{
-                                                padding: '5px 10px',
-                                                backgroundColor: '#dc3545',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '3px',
-                                                cursor: 'pointer',
-                                            }}
-                                        >
-                                            Отмена
-                                        </button>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                onClick={() => handleAddItem(order.id)}
+                                                disabled={
+                                                    isAddingItem[order.id] || !newItem.menu_item_id || !newItem.quantity
+                                                }
+                                                className={`flex-1 px-4 py-2 rounded-lg text-white shadow-md ${
+                                                    isAddingItem[order.id] ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                                                } transition`}
+                                            >
+                                                {isAddingItem[order.id] ? 'Добавление...' : 'Добавить'}
+                                            </button>
+                                            <button
+                                                onClick={() => setNewItem({ orderId: null, menu_item_id: '', quantity: '' })}
+                                                className="flex-1 px-4 py-2 bg-pink-500 text-white rounded-lg shadow-md hover:bg-pink-600 transition"
+                                            >
+                                                Отмена
+                                            </button>
+                                        </div>
                                     </div>
                                 ) : (
                                     <button
                                         onClick={() => setNewItem({ orderId: order.id, menu_item_id: '', quantity: '' })}
-                                        style={{
-                                            padding: '5px 10px',
-                                            backgroundColor: '#007bff',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '3px',
-                                            cursor: 'pointer',
-                                        }}
+                                        className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
                                     >
-                                        Добавить новый элемент
+                                        Добавить элемент
                                     </button>
                                 )}
                             </div>
