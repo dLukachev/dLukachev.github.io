@@ -1,62 +1,29 @@
 /* App.css */
 
-/* Сохраняем существующие стили */
-.App {
-  text-align: center;
+/* Основные стили для тёмной темы */
+:root {
+  --tg-theme-bg-color: #1e1e1e;
+  --tg-theme-text-color: #ffffff;
+  --tg-theme-hint-color: #b0b0b0;
+  --tg-theme-link-color: #1976d2;
+  --tg-theme-button-color: #1976d2;
+  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-secondary-bg-color: #2a2a2a;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: var(--tg-theme-bg-color, #282c34); /* Используем Telegram-переменную с запасным значением */
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--tg-theme-text-color, #ffffff); /* Обновляем цвет текста */
-}
-
-.App-link {
-  color: var(--tg-theme-link-color, #61dafb); /* Обновляем цвет ссылки */
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Добавляем стили для темной темы */
-
-/* Базовые стили для всего приложения */
+/* Фон приложения */
 body {
-  background-color: var(--tg-theme-bg-color, #121212);
-  color: var(--tg-theme-text-color, #e0e0e0);
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--tg-theme-bg-color, #1e1e1e);
+  color: var(--tg-theme-text-color, #ffffff);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Стили для элементов с className="text-center" */
+/* Центрированный текст */
 .text-center {
   text-align: center;
-  color: var(--tg-theme-text-color, #e0e0e0); /* Явно задаём цвет текста */
 }
 
-/* Стили для подсказок (например, "Ресторанов нет") */
+/* Подсказочный текст (серый) */
 .text-hint {
   color: var(--tg-theme-hint-color, #b0b0b0);
 }
@@ -66,57 +33,55 @@ button {
   background-color: var(--tg-theme-button-color, #1976d2);
   color: var(--tg-theme-button-text-color, #ffffff);
   border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #1565c0;
 }
 
 button:disabled {
-  background-color: var(--tg-theme-hint-color, #b0b0b0);
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Стили для карточек (например, bg-white) */
-.bg-white {
-  background-color: #1e1e1e; /* Темный фон вместо белого */
+/* Стили для кнопки удаления (красная) */
+button.bg-destructive {
+  background-color: #ef4444;
 }
 
-/* Стили для инпутов */
-input {
-  background-color: #2a2a2a;
-  color: var(--tg-theme-text-color, #e0e0e0);
-  border: 1px solid var(--tg-theme-hint-color, #b0b0b0);
-  border-radius: 4px;
+button.bg-destructive:hover {
+  background-color: #dc2626;
+}
+
+/* Стили для кнопки редактирования */
+button.bg-secondary {
+  background-color: var(--tg-theme-secondary-bg-color, #2a2a2a);
+}
+
+/* Стили для полей ввода */
+input,
+select {
+  background-color: var(--tg-theme-secondary-bg-color, #2a2a2a);
+  color: var(--tg-theme-text-color, #ffffff);
+  border: 1px solid #444;
   padding: 8px;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-input:focus {
+input::placeholder,
+select::placeholder {
+  color: var(--tg-theme-hint-color, #b0b0b0);
+}
+
+input:focus,
+select:focus {
   outline: none;
   border-color: var(--tg-theme-link-color, #1976d2);
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3);
 }
-
-/* Стили для карточек меню */
-.bg-gray-100 {
-  background-color: #2a2a2a;
-}
-
-/* Стили для текста в карточках меню */
-.text-sm {
-  color: var(--tg-theme-hint-color, #b0b0b0);
-}
-
-/* Стили для заголовков */
-h2, h3, h4 {
-  color: var(--tg-theme-text-color, #e0e0e0);
-}
-
-/* Стили для кнопок удаления */
-button.bg-destructive {
-  background-color: var(--tg-theme-destructive-color, #dc3545);
-}
-
-/* Добавляем в App.css */
 
 /* Стили для нижней навигации */
 .bottom-nav {
@@ -147,7 +112,23 @@ button.bg-destructive {
   font-size: 12px;
 }
 
-/* Стили для кнопки редактирования */
-button.bg-secondary {
-  background-color: var(--tg-theme-secondary-bg-color, #2a2a2a);
+/* Стили для карточек */
+.bg-white {
+  background-color: #2a2a2a; /* Заменяем белый фон на тёмный */
+}
+
+/* Стили для заголовков */
+h2, h3, h4, h5 {
+  color: var(--tg-theme-text-color, #ffffff);
+}
+
+/* Стили для списков */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+/* Стили для текста ошибок */
+.text-red-500 {
+  color: #ef4444;
 }
