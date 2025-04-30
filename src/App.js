@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import BottomNav from './components/BottomNav';
 import RestaurantList from './components/RestaurantList';
 import CartPage from './components/CartPage';
@@ -40,18 +40,10 @@ function AppContent() {
         <Route path="/restaurants-admin" element={<RestaurantsAdminPage />} />
         <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        {/* Перенаправление на главную страницу вместо NotFound */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <BottomNav />
-    </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <div className="text-center p-4 dark:bg-gray-800 dark:text-white flex items-center justify-center flex-col min-h-screen">
-      <h1 className="text-2xl font-bold mb-2">Страница не найдена</h1>
-      <p>Проверьте URL или вернитесь на главную страницу.</p>
     </div>
   );
 }
