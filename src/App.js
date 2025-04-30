@@ -40,7 +40,7 @@ function AppContent() {
         <Route path="/restaurants-admin" element={<RestaurantsAdminPage />} />
         <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <BottomNav />
     </div>
