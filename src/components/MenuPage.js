@@ -57,6 +57,7 @@ function MenuPage() {
       const cartItem = {
         menu_item_id: item.id,
         quantity: 1,
+        restaurant_id: parseInt(restaurantId), // Добавляем restaurant_id
       };
       const response = await api.addToCart(user.id, cartItem);
       alert('Добавлено в корзину: ' + response.message);
@@ -147,10 +148,10 @@ function MenuPage() {
   }
 
   return (
-    <div className="p-4">
+    <div className="dark p-4 dark:bg-gray-800 dark:text-white">
       <h2 className="text-xl font-bold mb-4">Меню ресторана</h2>
       {user.role === 'admin' && (
-        <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
+        <div className="mb-4 p-3 bg-gray-700 rounded-lg shadow-md">
           <h3 className="text-lg font-bold mb-2">Добавить новый пункт меню</h3>
           <div className="space-y-2">
             <input
@@ -197,7 +198,7 @@ function MenuPage() {
       )}
       <div className="grid gap-4">
         {menuItems.map((item) => (
-          <div key={item.id || item.name} className="p-3 bg-white rounded-lg shadow-md">
+          <div key={item.id || item.name} className="p-3 bg-gray-700 rounded-lg shadow-md">
             {editingItem === item.id ? (
               <div className="space-y-2">
                 <input

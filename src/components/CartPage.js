@@ -62,8 +62,13 @@ function CartPage() {
         return;
       }
 
+      if (!cartItems[0]?.restaurant_id) {
+        alert('Ошибка: ID ресторана не найден в корзине.');
+        return;
+      }
+
       const orderData = {
-        restaurant_id: cartItems[0]?.restaurant_id || 1,
+        restaurant_id: cartItems[0].restaurant_id, // Используем restaurant_id из корзины
         order_type: orderType,
       };
       const response = await api.createOrder(user.id, orderData);
@@ -95,14 +100,14 @@ function CartPage() {
   }
 
   return (
-    <div className="p-4">
+    <div className="dark p-4 dark:bg-gray-800 dark:text-white">
       <h2 className="text-xl font-bold mb-4">Корзина</h2>
       {cartItems.length === 0 ? (
         <p className="text-center text-hint">Корзина пуста</p>
       ) : (
         <div className="space-y-4">
           {cartItems.map((item) => (
-            <div key={item.menu_item_id} className="p-3 bg-white rounded-lg shadow-md flex justify-between items-center">
+            <div key={item.menu_item_id} className="p-3 bg-gray-700 rounded-lg shadow-md flex justify-between items-center">
               <div className="space-y-1">
                 <p className="font-bold">{item.name}</p>
                 <p className="text-sm text-hint">Цена: {item.price} руб.</p>
@@ -123,7 +128,7 @@ function CartPage() {
               id="orderType"
               value={orderType}
               onChange={(e) => setOrderType(e.target.value)}
-              className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+              className="p-2 rounded-md w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
             >
               <option value="DINE_IN">Обед в ресторане</option>
               <option value="DELIVERY">Доставка</option>
@@ -132,7 +137,7 @@ function CartPage() {
           </div>
           <button
             onClick={handleCreateOrder}
-            className="w-full px-4 py-3 rounded-lg shadow-md"
+            className="w-full px-4 py-3 rounded-lg shadow-md bg-blue-500 text-white hover:bg-blue-600"
           >
             Создать заказ
           </button>

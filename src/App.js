@@ -30,10 +30,7 @@ function AppContent() {
   }, [location]);
 
   return (
-    <div
-      className="min-h-screen pb-16"
-      style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)' }}
-    >
+    <div className="min-h-screen pb-16 dark">
       <Routes>
         <Route path="/" element={<RestaurantList />} />
         <Route path="/cart" element={<CartPage />} />
@@ -52,7 +49,7 @@ function AppContent() {
 
 function NotFound() {
   return (
-    <div className="text-center p-4" style={{ color: 'var(--tg-theme-text-color)', backgroundColor: 'var(--tg-theme-bg-color)', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+    <div className="text-center p-4 dark:bg-gray-800 dark:text-white flex items-center justify-center flex-col min-h-screen">
       <h1 className="text-2xl font-bold mb-2">Страница не найдена</h1>
       <p>Проверьте URL или вернитесь на главную страницу.</p>
     </div>
