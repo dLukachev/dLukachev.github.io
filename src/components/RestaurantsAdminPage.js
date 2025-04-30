@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext.js';
 import api from '../services/api.js';
-import { FaTrash, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaTimes } from 'react-icons/fa'; // Добавлен FaTimes
 
 function RestaurantsAdminPage() {
   const { user, loading: authLoading, authError } = useContext(AuthContext);
@@ -22,6 +22,7 @@ function RestaurantsAdminPage() {
   const [isDeleting, setIsDeleting] = useState({});
   const [isDeletingMenuItem, setIsDeletingMenuItem] = useState({});
 
+  // Загрузка ресторанов и их меню при монтировании компонента
   useEffect(() => {
     const fetchRestaurantsAndMenus = async () => {
       if (!user) return;
@@ -30,9 +31,11 @@ function RestaurantsAdminPage() {
         setLoading(true);
         setError(null);
 
+        // Получение списка ресторанов
         const restaurantsData = await api.getRestaurants({ user_id: user.id });
         setRestaurants(restaurantsData);
 
+        // Получение меню для каждого ресторана
         const menuData = {};
         for (const restaurant of restaurantsData) {
           const restaurantId = restaurant.data.restaurants_id;
@@ -50,6 +53,7 @@ function RestaurantsAdminPage() {
     fetchRestaurantsAndMenus();
   }, [user]);
 
+  // Функция для добавления нового ресторана
   const handleAddRestaurant = async () => {
     if (!newRestaurant) return;
 
@@ -66,6 +70,7 @@ function RestaurantsAdminPage() {
     }
   };
 
+  // Функция для удаления ресторана
   const handleDeleteRestaurant = async (restaurantId) => {
     setIsDeleting((prev) => ({ ...prev, [restaurantId]: true }));
     try {
@@ -84,11 +89,13 @@ function RestaurantsAdminPage() {
     }
   };
 
+  // Функция для изменения данных нового пункта меню
   const handleNewMenuItemChange = (e) => {
     const { name, value } = e.target;
     setNewMenuItem((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Функция для добавления нового пункта меню
   const handleCreateMenuItem = async (restaurantId) => {
     setIsAddingMenuItem((prev) => ({ ...prev, [restaurantId]: true }));
     try {
@@ -112,6 +119,7 @@ function RestaurantsAdminPage() {
     }
   };
 
+  // Функция для удаления пункта меню
   const handleDeleteMenuItem = async (restaurantId, menuItemId) => {
     setIsDeletingMenuItem((prev) => ({ ...prev, [menuItemId]: true }));
     try {
@@ -128,9 +136,13 @@ function RestaurantsAdminPage() {
     }
   };
 
+  // Проверка загрузки и авторизации
   if (authLoading) {
     return (
-      <div className="p-4">
+      <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+      >
         <p className="text-center">Загрузка...</p>
       </div>
     );
@@ -138,25 +150,36 @@ function RestaurantsAdminPage() {
 
   if (authError || !user) {
     return (
-      <div className="p-4">
-        <p className="text-center text-hint">
+      <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+      >
+        <p className="text-center" style={{ color: 'var(--tg-theme-hint-color, #B0B0B0)' }}>
           Ошибка авторизации: {authError || 'Пользователь не найден'}
         </p>
       </div>
     );
   }
 
-  if (user.role !== 'ADMIN') {
+  if (authError || !user) {
     return (
-      <div className="p-4">
-        <p className="text-center text-hint">Доступ запрещён</p>
+      <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+      >
+        <p className="text-center" style={{ color: 'var(--tg-theme-hint-color, #B0B0B0)' }}>
+          Доступ запрещён
+        </p>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="p-4">
+      <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+      >
         <p className="text-center">Загрузка ресторанов...</p>
       </div>
     );
@@ -164,15 +187,24 @@ function RestaurantsAdminPage() {
 
   if (error) {
     return (
-      <div className="p-4">
-        <p className="text-center text-hint">Ошибка: {error}</p>
+      <div
+        className="p-4"
+        style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+      >
+        <p className="text-center" style={{ color: 'var(--tg-theme-hint-color, #B0B0B0)' }}>
+          Ошибка: {error}
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="p-4">
+    <div
+      className="p-4"
+      style={{ backgroundColor: 'var(--tg-theme-bg-color, #121212)', color: 'var(--tg-theme-text-color, #E0E0E0)' }}
+    >
       <h2 className="text-xl font-bold mb-4">Управление ресторанами</h2>
+      {/* Форма добавления ресторана */}
       <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
         <h3 className="text-lg font-bold mb-2">Добавить новый ресторан</h3>
         <input
@@ -180,19 +212,26 @@ function RestaurantsAdminPage() {
           placeholder="Адрес ресторана"
           value={newRestaurant}
           onChange={(e) => setNewRestaurant(e.target.value)}
-          className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)] mb-2"
+          className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)] mb-2"
+          style={{ borderColor: 'var(--tg-theme-hint-color, #B0B0B0)' }}
         />
         <button
           onClick={handleAddRestaurant}
           disabled={isAdding || !newRestaurant}
           className="w-full px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+          style={{
+            backgroundColor: isAdding ? 'var(--tg-theme-hint-color, #B0B0B0)' : 'var(--tg-theme-button-color, #1976D2)',
+            color: 'var(--tg-theme-button-text-color, #FFFFFF)',
+          }}
         >
           {isAdding ? 'Добавление...' : 'Добавить ресторан'}
         </button>
       </div>
       <h3 className="text-lg font-bold mb-2">Список ресторанов</h3>
       {restaurants.length === 0 ? (
-        <p className="text-center text-hint">Ресторанов нет</p>
+        <p className="text-center" style={{ color: 'var(--tg-theme-hint-color, #B0B0B0)' }}>
+          Ресторанов нет
+        </p>
       ) : (
         <div className="space-y-4">
           {restaurants.map((restaurant) => (
@@ -204,11 +243,18 @@ function RestaurantsAdminPage() {
                 <button
                   onClick={() => handleDeleteRestaurant(restaurant.data.restaurants_id)}
                   disabled={isDeleting[restaurant.data.restaurants_id]}
-                  className="p-2 rounded-md disabled:opacity-50 bg-destructive"
+                  className="p-2 rounded-md disabled:opacity-50"
+                  style={{
+                    backgroundColor: isDeleting[restaurant.data.restaurants_id]
+                      ? 'var(--tg-theme-hint-color, #B0B0B0)'
+                      : 'var(--tg-theme-destructive-color, #dc3545)',
+                    color: 'var(--tg-theme-button-text-color, #FFFFFF)',
+                  }}
                 >
                   <FaTrash size={16} />
                 </button>
               </div>
+              {/* Форма добавления пункта меню */}
               {newMenuItem.restaurantId === restaurant.data.restaurants_id ? (
                 <div className="mb-4 p-3 bg-gray-100 rounded-lg">
                   <h4 className="text-sm font-medium">Добавить пункт меню</h4>
@@ -219,7 +265,8 @@ function RestaurantsAdminPage() {
                       placeholder="Название"
                       value={newMenuItem.name}
                       onChange={handleNewMenuItemChange}
-                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      style={{ borderColor: 'var(--tg-theme-hint-color, #B0B0B0)' }}
                     />
                     <input
                       type="number"
@@ -227,7 +274,8 @@ function RestaurantsAdminPage() {
                       placeholder="Цена"
                       value={newMenuItem.price}
                       onChange={handleNewMenuItemChange}
-                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      style={{ borderColor: 'var(--tg-theme-hint-color, #B0B0B0)' }}
                     />
                     <input
                       type="text"
@@ -235,7 +283,8 @@ function RestaurantsAdminPage() {
                       placeholder="Описание (опционально)"
                       value={newMenuItem.description}
                       onChange={handleNewMenuItemChange}
-                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      style={{ borderColor: 'var(--tg-theme-hint-color, #B0B0B0)' }}
                     />
                     <input
                       type="text"
@@ -243,7 +292,8 @@ function RestaurantsAdminPage() {
                       placeholder="URL изображения (опционально)"
                       value={newMenuItem.image_url}
                       onChange={handleNewMenuItemChange}
-                      className="p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      className="p-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-link-color)]"
+                      style={{ borderColor: 'var(--tg-theme-hint-color, #B0B0B0)' }}
                     />
                     <div className="flex space-x-2">
                       <button
@@ -254,6 +304,12 @@ function RestaurantsAdminPage() {
                           !newMenuItem.price
                         }
                         className="flex-1 px-4 py-2 rounded-lg shadow-md disabled:opacity-50 flex items-center justify-center"
+                        style={{
+                          backgroundColor: isAddingMenuItem[restaurant.data.restaurants_id]
+                            ? 'var(--tg-theme-hint-color, #B0B0B0)'
+                            : 'var(--tg-theme-button-color, #1976D2)',
+                          color: 'var(--tg-theme-button-text-color, #FFFFFF)',
+                        }}
                       >
                         <FaPlus className="mr-2" />{' '}
                         {isAddingMenuItem[restaurant.data.restaurants_id] ? 'Добавление...' : 'Добавить'}
@@ -268,7 +324,11 @@ function RestaurantsAdminPage() {
                             image_url: '',
                           })
                         }
-                        className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center bg-destructive"
+                        className="flex-1 px-4 py-2 rounded-lg shadow-md flex items-center justify-center"
+                        style={{
+                          backgroundColor: 'var(--tg-theme-destructive-color, #dc3545)',
+                          color: 'var(--tg-theme-button-text-color, #FFFFFF)',
+                        }}
                       >
                         <FaTimes className="mr-2" /> Отмена
                       </button>
@@ -287,6 +347,10 @@ function RestaurantsAdminPage() {
                     })
                   }
                   className="w-full px-4 py-2 rounded-lg shadow-md flex items-center justify-center mb-2"
+                  style={{
+                    backgroundColor: 'var(--tg-theme-button-color, #1976D2)',
+                    color: 'var(--tg-theme-button-text-color, #FFFFFF)',
+                  }}
                 >
                   <FaPlus className="mr-2" /> Добавить пункт меню
                 </button>
@@ -294,7 +358,9 @@ function RestaurantsAdminPage() {
               <div className="mt-2">
                 <h4 className="text-sm font-medium">Меню ресторана</h4>
                 {menuItems[restaurant.data.restaurants_id]?.length === 0 ? (
-                  <p className="text-sm text-hint">Меню пусто</p>
+                  <p className="text-sm" style={{ color: 'var(--tg-theme-hint-color, #B0B0B0)' }}>
+                    Меню пусто
+                  </p>
                 ) : (
                   <div className="space-y-2 mt-2">
                     {menuItems[restaurant.data.restaurants_id]?.map((item) => (
@@ -302,13 +368,19 @@ function RestaurantsAdminPage() {
                         key={item.id}
                         className="flex justify-between items-center p-2 bg-gray-100 rounded-md"
                       >
-                        <span className="text-sm">
+                        <span className="text-sm" style={{ color: 'var(--tg-theme-hint-color, #B0B0B0)' }}>
                           ID: {item.id}, {item.name}, Цена: {item.price}
                         </span>
                         <button
                           onClick={() => handleDeleteMenuItem(restaurant.data.restaurants_id, item.id)}
                           disabled={isDeletingMenuItem[item.id]}
-                          className="p-2 rounded-md disabled:opacity-50 bg-destructive"
+                          className="p-2 rounded-md disabled:opacity-50"
+                          style={{
+                            backgroundColor: isDeletingMenuItem[item.id]
+                              ? 'var(--tg-theme-hint-color, #B0B0B0)'
+                              : 'var(--tg-theme-destructive-color, #dc3545)',
+                            color: 'var(--tg-theme-button-text-color, #FFFFFF)',
+                          }}
                         >
                           <FaTrash size={16} />
                         </button>

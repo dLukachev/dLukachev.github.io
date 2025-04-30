@@ -54,11 +54,26 @@ function MenuPage() {
     const itemId = item.id;
     setIsAdding((prev) => ({ ...prev, [itemId]: true }));
     try {
+      // Проверяем restaurantId
+      const parsedRestaurantId = parseInt(restaurantId);
+      if (isNaN(parsedRestaurantId)) {
+        throw new Error('Некорректный ID ресторана');
+      }
+
+      // Проверяем menu_item_id
+      if (!item.id || isNaN(item.id)) {
+        throw new Error('Некорректный ID пункта меню');
+      }
+
       const cartItem = {
-        menu_item_id: item.id,
+        menu_item_id: parseInt(item.id),
         quantity: 1,
-        restaurant_id: parseInt(restaurantId), // Добавляем restaurant_id
+        restaurant_id: parsedRestaurantId,
       };
+
+      // Логируем данные для отладки
+      console.log('Добавление в корзину:', cartItem);
+
       const response = await api.addToCart(user.id, cartItem);
       alert('Добавлено в корзину: ' + response.message);
     } catch (error) {

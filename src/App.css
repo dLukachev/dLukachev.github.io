@@ -2,18 +2,18 @@
 
 /* Переопределяем Telegram-переменные для темной темы */
 :root {
-  --tg-theme-bg-color: #1e1e1e;
-  --tg-theme-text-color: #ffffff;
-  --tg-theme-hint-color: #b0b0b0;
-  --tg-theme-link-color: #1976d2;
-  --tg-theme-button-color: #1976d2;
-  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-bg-color: #1e1e1e !important;
+  --tg-theme-text-color: #ffffff !important;
+  --tg-theme-hint-color: #b0b0b0 !important;
+  --tg-theme-link-color: #1976d2 !important;
+  --tg-theme-button-color: #1976d2 !important;
+  --tg-theme-button-text-color: #ffffff !important;
 }
 
 /* Фон приложения */
 body {
-  background-color: var(--tg-theme-bg-color, #1e1e1e);
-  color: var(--tg-theme-text-color, #ffffff);
+  background-color: var(--tg-theme-bg-color, #1e1e1e) !important;
+  color: var(--tg-theme-text-color, #ffffff) !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
@@ -29,14 +29,14 @@ body {
 
 /* Стили для кнопок */
 button {
-  background-color: var(--tg-theme-button-color, #1976d2);
-  color: var(--tg-theme-button-text-color, #ffffff);
+  background-color: var(--tg-theme-button-color, #1976d2) !important;
+  color: var(--tg-theme-button-text-color, #ffffff) !important;
   border: none;
   transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #1565c0;
+  background-color: #1565c0 !important;
 }
 
 button:disabled {
@@ -46,24 +46,24 @@ button:disabled {
 
 /* Стили для кнопки удаления (красная) */
 button.bg-destructive {
-  background-color: #ef4444;
+  background-color: #ef4444 !important;
 }
 
 button.bg-destructive:hover {
-  background-color: #dc2626;
+  background-color: #dc2626 !important;
 }
 
 /* Стили для кнопки редактирования */
 button.bg-secondary {
-  background-color: #2a2a2a;
+  background-color: #2a2a2a !important;
 }
 
 /* Стили для полей ввода */
 input,
 select {
-  background-color: #2a2a2a;
-  color: var(--tg-theme-text-color, #ffffff);
-  border: 1px solid #444;
+  background-color: #2a2a2a !important;
+  color: var(--tg-theme-text-color, #ffffff) !important;
+  border: 1px solid #444 !important;
   padding: 8px;
   border-radius: 6px;
   width: 100%;
@@ -73,15 +73,15 @@ select {
 /* Placeholder текст */
 input::placeholder,
 select::placeholder {
-  color: var(--tg-theme-hint-color, #b0b0b0);
+  color: var(--tg-theme-hint-color, #b0b0b0) !important;
 }
 
 /* Фокус для полей ввода */
 input:focus,
 select:focus {
   outline: none;
-  border-color: var(--tg-theme-link-color, #1976d2);
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3);
+  border-color: var(--tg-theme-link-color, #1976d2) !important;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3) !important;
 }
 
 /* Стили для нижней навигации */
@@ -90,7 +90,7 @@ select:focus {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--tg-theme-bg-color, #1e1e1e);
+  background-color: var(--tg-theme-bg-color, #1e1e1e) !important;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: space-around;
@@ -101,12 +101,12 @@ select:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--tg-theme-hint-color, #b0b0b0);
+  color: var(--tg-theme-hint-color, #b0b0b0) !important;
   text-decoration: none;
 }
 
 .nav-item.active {
-  color: var(--tg-theme-link-color, #1976d2);
+  color: var(--tg-theme-link-color, #1976d2) !important;
 }
 
 .nav-item span {
@@ -115,19 +115,19 @@ select:focus {
 
 /* Стили для карточек */
 .bg-white {
-  background-color: #2a2a2a;
-  color: var(--tg-theme-text-color, #ffffff);
+  background-color: #2a2a2a !important;
+  color: var(--tg-theme-text-color, #ffffff) !important;
 }
 
 /* Стили для внутренних элементов карточек */
 .bg-white p,
 .bg-white span {
-  color: var(--tg-theme-text-color, #ffffff);
+  color: var(--tg-theme-text-color, #ffffff) !important;
 }
 
 /* Стили для заголовков */
 h2, h3, h4, h5 {
-  color: var(--tg-theme-text-color, #ffffff);
+  color: var(--tg-theme-text-color, #ffffff) !important;
 }
 
 /* Стили для списков */
@@ -138,23 +138,23 @@ ul {
 
 /* Стили для текста ошибок */
 .text-red-500 {
-  color: #ef4444;
+  color: #ef4444 !important;
 }
 
 /* Стили для элементов внутри списка (например, пункты меню) */
 .bg-gray-100 {
-  background-color: #2a2a2a;
-  color: var(--tg-theme-text-color, #ffffff);
+  background-color: #2a2a2a !important;
+  color: var(--tg-theme-text-color, #ffffff) !important;
 }
 
 /* Темная тема Tailwind */
 .dark {
-  background-color: var(--tg-theme-bg-color, #1e1e1e);
-  color: var(--tg-theme-text-color, #ffffff);
+  background-color: var(--tg-theme-bg-color, #1e1e1e) !important;
+  color: var(--tg-theme-text-color, #ffffff) !important;
 }
 
 .dark .bg-white {
-  background-color: #2a2a2a;
+  background-color: #2a2a2a !important;
 }
 
 .dark .text-hint {
@@ -162,12 +162,20 @@ ul {
 }
 
 .dark button {
-  background-color: var(--tg-theme-button-color, #1976d2);
-  color: var(--tg-theme-button-text-color, #ffffff);
+  background-color: var(--tg-theme-button-color, #1976d2) !important;
+  color: var(--tg-theme-button-text-color, #ffffff) !important;
 }
 
 .dark input,
 .dark select {
-  background-color: #2a2a2a;
-  color: var(--tg-theme-text-color, #ffffff);
+  background-color: #2a2a2a !important;
+  color: var(--tg-theme-text-color, #ffffff) !important;
+}
+
+/* Явно задаем белый текст для всех элементов, кроме тех, где используется .text-hint */
+.dark p,
+.dark div,
+.dark span,
+.dark label {
+  color: var(--tg-theme-text-color, #ffffff) !important;
 }

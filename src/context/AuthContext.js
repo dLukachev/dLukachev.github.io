@@ -9,6 +9,17 @@ export const AuthProvider = ({ children }) => {
     const [authError, setAuthError] = useState(null);
     const [retryCount, setRetryCount] = useState(0);
 
+    // Временные мок-данные для локального тестирования
+    const mockUser = {
+        id: '123456',
+        firstName: 'LocalTestUser',
+        lastName: 'Test',
+        username: 'localtestuser',
+        role: 'admin', // Добавляем роль admin для доступа к административным функциям
+    };
+
+    // Закомментируем оригинальную логику авторизации
+    /*
     const validateTelegram = async (initDataRaw) => {
         try {
             console.log('Validating initData:', initDataRaw);
@@ -103,6 +114,15 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         initTelegram();
     }, [retryCount]);
+    */
+
+    // Используем мок-данные вместо реальной авторизации
+    useEffect(() => {
+        console.log('Используются мок-данные для локального тестирования:', mockUser);
+        setUser(mockUser);
+        setAuthError(null);
+        setLoading(false);
+    }, []);
 
     return (
         <AuthContext.Provider value={{ user, loading, authError }}>
