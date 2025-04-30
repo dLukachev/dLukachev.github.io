@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import BottomNav from './components/BottomNav';
 import RestaurantList from './components/RestaurantList';
 import CartPage from './components/CartPage';
@@ -14,17 +14,8 @@ import { AuthProvider } from './context/AuthContext';
 
 function AppContent() {
   const location = useLocation();
-  const navigate = useNavigate();
 
-  // Принудительное перенаправление на главную страницу при загрузке
-  useEffect(() => {
-    if (location.pathname !== '/') {
-      navigate('/', { replace: true });
-    }
-  }, []); // Пустой массив зависимостей, чтобы сработало только при первой загрузке
-
-  // Логика для кнопки "Назад" в Telegram
-  useEffect(() => {
+  React.useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
       const backButton = window.Telegram.WebApp.BackButton;
       if (['/', '/cart', '/orders', '/profile'].includes(location.pathname)) {
@@ -49,6 +40,7 @@ function AppContent() {
         <Route path="/restaurants-admin" element={<RestaurantsAdminPage />} />
         <Route path="/restaurants/:restaurantId/reservations" element={<ReservationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        {/* Перенаправление на главную страницу вместо NotFound */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <BottomNav />
